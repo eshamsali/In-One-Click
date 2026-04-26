@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StatLab — Smart Statistical Analysis</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"/>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">SL</div>
+        StatLab
+      </div>
+
+      <!-- زر الموبايل (Hamburger) -->
+      <button
+        class="mobile-toggle"
+        onclick="toggleSidebar()"
+        aria-label="Menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav-menu">
+        <a href="#" class="nav-link active" onclick="toggleSidebar()">Home</a>
+        <a href="#features" class="nav-link" onclick="toggleSidebar()">Features</a>
+        <a href="#about" class="nav-link" onclick="toggleSidebar()">About</a>
+        <a href="#how-it-works" class="nav-link" onclick="toggleSidebar()">How It Works</a>
+        
+        <!-- مكان زر الحساب في الموبايل -->
+        <div id="mobileAuthContainer" class="mobile-auth-btn"></div>
+      </nav>
+
+      <div class="header-right">
+        <button class="toolbar-btn" onclick="location.href = 'auth.html'">
+          Log in
+        </button>
+      </div>
+    </header>
+
+    <!-- غطاء الخلفية عند فتح المنيو -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Hero Section -->
+    <section class="landing-hero">
+      <!-- Floating decorative elements -->
+      <div class="float-element" style="top:10%;left:15%;animation:float 6s infinite"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+      <div class="float-element" style="bottom:20%;right:10%;animation:float 8s infinite"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+      <div class="float-element" style="top:40%;right:15%;animation:float 7s infinite"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+
+      <div class="hero-content">
+        <h1 class="hero-title">Statistical Analysis <span>in One Click</span></h1>
+        <p class="hero-desc">
+          Turn your raw data into clear insights and professional reports. StatLab provides
+          you with the tools to analyze your medical and engineering data with precision and ease.
+        </p>
+        <div class="hero-btns">
+          <button
+            class="toolbar-btn primary btn-lg"
+            onclick="location.href = 'workspace.html'">
+            Start for Free
+          </button>
+          <button
+            class="toolbar-btn btn-lg"
+            onclick="location.href = 'auth.html#register'">
+            Create Account
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Banner -->
+    <section class="stats-banner">
+      <div class="stats-container">
+        <div class="stat-item">
+          <div class="stat-num">+10k</div>
+          <div class="stat-label">Files Analyzed</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">99.9%</div>
+          <div class="stat-label">Calculation Accuracy</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">24/7</div>
+          <div class="stat-label">Tech Support</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">Free</div>
+          <div class="stat-label">For Researchers & Students</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <div class="features-wrapper" id="features">
+      <section class="features-section">
+        <div class="section-label">
+          <p class="hero-tag">Core Capabilities</p>
+          <h2 class="features-heading">Everything You Need in One Place</h2>
+          <p class="features-subheading">Advanced tools designed specifically for researchers</p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 17V12m4 5V8m4 9v-4"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Comprehensive Descriptive Statistics</h3>
+            <p class="feature-text">Get mean, standard deviation, skewness, and kurtosis for your data with a single click.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="12" r="3"/><circle cx="18" cy="5" r="2"/><circle cx="18" cy="19" r="2"/><path d="m11.9 10.6 4.2-3.7M11.9 13.4l4.2 3.7"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Correlation Matrix</h3>
+            <p class="feature-text">Analyze variable relationships with a colorful visual representation showing correlation strength and direction.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v3m0 12v3M4.22 4.22l2.12 2.12m11.32 11.32 2.12 2.12M3 12h3m12 0h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/><circle cx="12" cy="12" r="4"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Hypothesis Testing</h3>
+            <p class="feature-text">Full support for independent groups T-Test with statistical significance calculation.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">PDF Export</h3>
+            <p class="feature-text">Convert your results into structured PDF reports ready for scientific publication.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Excel &amp; CSV Support</h3>
+            <p class="feature-text">Upload files in various popular formats and the system will automatically recognize variables.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Specialized Templates</h3>
+            <p class="feature-text">Custom interfaces for medical and engineering fields that align with your discipline's terminology.</p>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+    <!-- About Section -->
+    <section
+      class="features-section"
+      id="about"
+      style="border-top: 1px solid var(--border); padding-top: 100px"
+    >
+      <div class="split-grid">
+        <div class="about-text">
+          <span class="hero-tag" style="margin-bottom: 16px">About the Platform</span>
+          <h2
+            style="
+              font-size: 36px;
+              color: #fff;
+              margin-bottom: 24px;
+              line-height: 1.3;
+            ">
+            Our Vision is to Simplify Data for Everyone
+          </h2>
+          <p
+            style="
+              color: var(--text2);
+              line-height: 1.8;
+              margin-bottom: 20px;
+              font-size: 16px;">
+            StatLab started as an idea to bridge the gap between the complexity of traditional
+            statistical tools and the needs of modern researchers. We believe that statistical analysis
+            shouldn't be an obstacle to innovation, but rather a tool that empowers you to understand your data deeper.
+          </p>
+          <p
+            style="
+              color: var(--text2);
+              line-height: 1.8;
+              margin-bottom: 32px;
+              font-size: 16px;">
+            Whether you're a medical researcher needing accurate T-Test results, or an engineer
+            analyzing variable correlations, StatLab provides an intuitive interface and powerful tools
+            that make analysis an enjoyable and precise process.
+          </p>
+          <div style="display: flex; gap: 40px">
+            <div>
+              <div
+                style="
+                  color: var(--blue);
+                  font-size: 28px;
+                  font-weight: 700;
+                  margin-bottom: 4px;">
+                100%
+              </div>
+              <div
+                style="
+                  color: var(--text3);
+                  font-size: 12px;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                "
+              >
+                Data Security
+              </div>
+            </div>
+            <div>
+              <div
+                style="
+                  color: var(--cyan);
+                  font-size: 28px;
+                  font-weight: 700;
+                  margin-bottom: 4px;
+                "
+              >
+                Instant
+              </div>
+              <div
+                style="
+                  color: var(--text3);
+                  font-size: 12px;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                "
+              >
+                Real-Time Processing
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="about-visual">
+          <div
+            style="
+              width: 100%;
+              height: 440px;
+              background: var(--surface);
+              border: 1px solid var(--border2);
+              border-radius: var(--radius-xl);
+              position: relative;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+              box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+            "
+          >
+            <!-- UI Mockup inside About -->
+            <div
+              style="
+                width: 85%;
+                background: var(--surface2);
+                border: 1px solid var(--border3);
+                border-radius: 12px;
+                padding: 24px;
+                position: relative;
+                z-index: 2;
+                transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+              "
+            >
+              <div style="display: flex; gap: 6px; margin-bottom: 20px">
+                <div
+                  style="
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    background: var(--red);
+                  "
+                ></div>
+                <div
+                  style="
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    background: var(--amber);
+                  "
+                ></div>
+                <div
+                  style="
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    background: var(--green);
+                  "
+                ></div>
+              </div>
+              <div
+                style="
+                  width: 60%;
+                  height: 10px;
+                  background: var(--border2);
+                  border-radius: 5px;
+                  margin-bottom: 24px;
+                "
+              ></div>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(2, 1fr);
+                  gap: 16px;
+                  margin-bottom: 24px;
+                "
+              >
+                <div
+                  style="
+                    height: 60px;
+                    background: var(--surface3);
+                    border-radius: 8px;
+                    border: 1px solid var(--border);
+                  "
+                ></div>
+                <div
+                  style="
+                    height: 60px;
+                    background: var(--surface3);
+                    border-radius: 8px;
+                    border: 1px solid var(--border);
+                  "
+                ></div>
+              </div>
+              <div
+                style="
+                  height: 120px;
+                  background: var(--surface);
+                  border: 1px solid var(--border2);
+                  border-radius: 8px;
+                  display: flex;
+                  align-items: flex-end;
+                  padding: 12px;
+                  gap: 10px;
+                "
+              >
+                <div
+                  style="
+                    flex: 1;
+                    height: 40%;
+                    background: var(--blue);
+                    border-radius: 4px 4px 0 0;
+                  "
+                ></div>
+                <div
+                  style="
+                    flex: 1;
+                    height: 80%;
+                    background: var(--cyan);
+                    border-radius: 4px 4px 0 0;
+                  "
+                ></div>
+                <div
+                  style="
+                    flex: 1;
+                    height: 60%;
+                    background: var(--blue);
+                    border-radius: 4px 4px 0 0;
+                  "
+                ></div>
+                <div
+                  style="
+                    flex: 1;
+                    height: 95%;
+                    background: var(--cyan);
+                    border-radius: 4px 4px 0 0;
+                  "
+                ></div>
+              </div>
+            </div>
+            <div
+              style="
+                position: absolute;
+                width: 150%;
+                height: 150%;
+                background: radial-gradient(
+                  circle,
+                  rgba(79, 163, 255, 0.05) 0%,
+                  transparent 70%
+                );
+                z-index: 1;
+              "
+            ></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Divider -->
+    <div
+      style="
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--border2),
+          transparent
+        );
+        max-width: 1200px;
+        margin: 0 auto;
+      "
+    ></div>
+
+    <!-- How It Works Section -->
+    <section
+      class="features-section"
+      id="how-it-works"
+      style="background: var(--surface2); padding: 100px 20px">
+      <div style="text-align: center; margin-bottom: 80px">
+        <span class="hero-tag" style="margin-bottom: 16px"
+          >Simplicity in 3 Steps</span>
+        <h2 style="font-size: 32px; color: #fff">How to Start Your Journey with StatLab?</h2>
+      </div>
+
+      <div class="steps-grid">
+        <!-- Step 1 -->
+        <div style="text-align: center; position: relative; z-index: 2">
+          <div
+            style="
+              width: 80px;
+              height: 80px;
+              background: linear-gradient(
+                135deg,
+                var(--blue) 0%,
+                var(--indigo) 100%
+              );
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 24px;
+              font-size: 32px;
+              color: #fff;
+              box-shadow: 0 15px 30px rgba(79, 163, 255, 0.3);
+            "
+          >
+            1
+          </div>
+          <h3 style="color: #fff; margin-bottom: 16px; font-size: 20px">
+            Upload Your Data
+          </h3>
+          <p style="color: var(--text2); line-height: 1.6; font-size: 14px">
+            Choose an Excel or CSV file from your device, and the system will automatically recognize the variables.
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div style="text-align: center; position: relative; z-index: 2">
+          <div
+            style="
+              width: 80px;
+              height: 80px;
+              background: linear-gradient(
+                135deg,
+                var(--cyan) 0%,
+                var(--blue) 100%
+              );
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 24px;
+              font-size: 32px;
+              color: #fff;
+              box-shadow: 0 15px 30px rgba(0, 212, 245, 0.3);
+            "
+          >
+            2
+          </div>
+          <h3 style="color: #fff; margin-bottom: 16px; font-size: 20px">
+            Choose Analysis Type
+          </h3>
+          <p style="color: var(--text2); line-height: 1.6; font-size: 14px">
+            Select from a wide range of advanced statistical tests (T-Test, Correlation, etc).
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div style="text-align: center; position: relative; z-index: 2">
+          <div
+            style="
+              width: 80px;
+              height: 80px;
+              background: linear-gradient(
+                135deg,
+                var(--green) 0%,
+                var(--cyan) 100%
+              );
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 24px;
+              font-size: 32px;
+              color: #fff;
+              box-shadow: 0 15px 30px rgba(0, 229, 163, 0.3);
+            "
+          >
+            3
+          </div>
+          <h3 style="color: #fff; margin-bottom: 16px; font-size: 20px">
+            Get Your Report
+          </h3>
+          <p style="color: var(--text2); line-height: 1.6; font-size: 14px">
+            Receive your results instantly as interactive reports and professional ready-to-print charts.
+          </p>
+        </div>
+
+        <!-- Connecting line (Desktop only) -->
+        <div
+          style="
+            position: absolute;
+            top: 40px;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: dashed var(--border3);
+            border-top: 2px dashed var(--border3);
+            z-index: 1;
+            opacity: 0.3;
+          "
+        ></div>
+      </div>
+    </section>
+
+    <!-- Divider -->
+    <div
+      style="
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--border2),
+          transparent
+        );
+        max-width: 1200px;
+        margin: 0 auto;
+      "
+    ></div>
+
+    <footer
+      style="
+        padding: 20px;
+        text-align: center;
+        border-top: 1px solid var(--border);
+        margin-top: 80px;
+      "
+    >
+      <div class="logo" style="justify-content: center; margin-bottom: 12px">
+        <div class="logo-icon">SL</div>
+        StatLab
+      </div>
+      <p style="color: var(--text3); font-size: 13px">
+        © 2026 All rights reserved to StatLab for Statistical Analysis.
+      </p>
+    </footer>
+
+    <script>
+      function checkAuth() {
+        const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+        const headerRight = document.querySelector(".header-right");
+        const heroBtns = document.querySelector(".hero-btns");
+        const mobileAuth = document.getElementById("mobileAuthContainer");
+
+        if (isLoggedIn) {
+          // تحديث الهيدر للدسكتاب
+          headerRight.innerHTML = `
+            <button class="toolbar-btn primary" onclick="location.href='profile.html'">Profile</button>
+          `;
+
+          // تحديث المنيو الجانبي للموبايل
+          if (mobileAuth) {
+            mobileAuth.innerHTML = `
+              <button class="toolbar-btn primary" style="width:100%; justify-content:center; padding:12px;" onclick="location.href='profile.html'">Profile</button>
+            `;
+          }
+
+          // تحديث أزرار الـ Hero
+          if (heroBtns) {
+            heroBtns.innerHTML = `
+              <button class="toolbar-btn primary btn-lg" onclick="location.href='workspace.html'">Start Analysis Now</button>
+            `;
+          }
+        } else {
+          // لو مش مسجل، نظهر زر تسجيل الدخول في الموبايل
+          if (mobileAuth) {
+            mobileAuth.innerHTML = `
+              <button class="toolbar-btn primary" style="width:100%; justify-content:center; padding:12px;" onclick="location.href='auth.html'">Log in</button>
+            `;
+          }
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userName");
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("csvData");
+        localStorage.removeItem("csvHeaders");
+        localStorage.removeItem("fileName");
+        localStorage.removeItem("fileSize");
+        location.href = "index.html";
+      }
+
+      function toggleSidebar() {
+        if (window.innerWidth > 768) return;
+        document.querySelector(".nav-menu").classList.toggle("open");
+        document.querySelector(".sidebar-overlay").classList.toggle("open");
+        document.querySelector(".mobile-toggle").classList.toggle("open");
+      }
+
+      // تشغيل التحقق عند تحميل الصفحة
+      window.onload = () => {
+        checkAuth();
+
+        // منطق تحديد السيكشن النشط عند السكرول
+        const sections = document.querySelectorAll("section[id]");
+        const navLinks = document.querySelectorAll(".nav-link");
+
+        window.addEventListener("scroll", () => {
+          let current = "";
+          const threshold = 120; // نقطة التحول
+
+          sections.forEach((section) => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - threshold) {
+              current = section.getAttribute("id");
+            }
+          });
+
+          navLinks.forEach((link) => {
+            link.classList.remove("active");
+            const href = link.getAttribute("href");
+
+            if (current && href.includes(current)) {
+              link.classList.add("active");
+            } else if (!current && href === "#") {
+              // لو مفيش سيكشن محدد إحنا في الهيرو (الرئيسية)
+              link.classList.add("active");
+            }
+          });
+        });
+      };
+    </script>
+  </body>
+</html>

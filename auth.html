@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StatLab — Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-container">
+    <div class="auth-card" id="authCard">
+
+      <!-- Login Form -->
+      <div id="loginSection">
+        <div class="auth-header">
+          <div class="auth-logo" onclick="location.href='index.html'" style="cursor:pointer">
+            <div class="logo-icon">SL</div>
+          </div>
+          <h1 class="auth-title">Welcome Back</h1>
+          <p class="auth-subtitle">Sign in to continue with StatLab</p>
+        </div>
+
+        <form class="auth-form" onsubmit="return false;">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-input" placeholder="example@domain.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="auth-btn">Sign In</button>
+        </form>
+
+        <div class="auth-footer">
+          Don't have an account? <a href="#" class="auth-link" onclick="toggleAuth('register')">Create new account</a>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerSection" style="display:none">
+        <div class="auth-header">
+          <div class="auth-logo" onclick="location.href='index.html'" style="cursor:pointer">
+            <div class="logo-icon">SL</div>
+          </div>
+          <h1 class="auth-title">Create Account</h1>
+          <p class="auth-subtitle">Join us and start your statistical analysis today</p>
+        </div>
+
+        <form class="auth-form" onsubmit="return false;">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" placeholder="Enter your full name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-input" placeholder="example@domain.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="auth-btn">Create Account</button>
+        </form>
+
+        <div class="auth-footer">
+          Already have an account? <a href="#" class="auth-link" onclick="toggleAuth('login')">Sign In</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Redirect if already logged in
+    (function() {
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        window.location.href = 'workspace.html';
+      }
+      // Auto-switch to register if URL has #register
+      if (window.location.hash === '#register') {
+        window.addEventListener('DOMContentLoaded', function() {
+          toggleAuth('register');
+        });
+      }
+    })();
+
+    // Toggle between login and register forms
+    function toggleAuth(type) {
+      const loginSection = document.getElementById('loginSection');
+      const registerSection = document.getElementById('registerSection');
+      if (type === 'register') {
+        loginSection.style.display = 'none';
+        registerSection.style.display = 'block';
+        document.title = 'StatLab — Create Account';
+      } else {
+        loginSection.style.display = 'block';
+        registerSection.style.display = 'none';
+        document.title = 'StatLab — Sign In';
+      }
+    }
+
+    // Handle form submission — simulate login and save to localStorage
+    document.querySelectorAll('.auth-form').forEach(form => {
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const nameInput = form.querySelector('input[type="text"]');
+        const emailInput = form.querySelector('input[type="email"]');
+        const name = nameInput ? nameInput.value : (localStorage.getItem('userName') || 'User');
+        const email = emailInput ? emailInput.value : 'user@statlab.com';
+
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userName', name);
+        localStorage.setItem('userEmail', email);
+        localStorage.setItem('joinDate', new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
+
+        window.location.href = 'workspace.html';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+{
+  "disease": "diabetes",
+  "model_type": "LogisticRegression",
+  "features": [
+    "Pregnancies",
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI",
+    "DiabetesPedigreeFunction",
+    "Age"
+  ],
+  "target": "Outcome",
+  "target_labels": {
+    "0": "Non-Diabetic",
+    "1": "Diabetic"
+  },
+  "training_rows": 768,
+  "accuracy": 0.9544,
+  "cv_accuracy": 0.9493,
+  "cv_std": 0.0171,
+  "auc_roc": 0.99,
+  "coefficients": {
+    "Pregnancies": 0.3033,
+    "Glucose": 2.2545,
+    "BloodPressure": -0.066,
+    "SkinThickness": 0.0441,
+    "Insulin": 1.4284,
+    "BMI": 0.122,
+    "DiabetesPedigreeFunction": 0.0969,
+    "Age": 0.1174
+  },
+  "feature_ranges": {
+    "Pregnancies": {
+      "mean": 4.79,
+      "std": 4.29,
+      "min": 0.0,
+      "max": 17.0
+    },
+    "Glucose": {
+      "mean": 126.74,
+      "std": 28.65,
+      "min": 60.0,
+      "max": 207.9
+    },
+    "BloodPressure": {
+      "mean": 71.78,
+      "std": 12.3,
+      "min": 40.0,
+      "max": 119.1
+    },
+    "SkinThickness": {
+      "mean": 23.65,
+      "std": 9.43,
+      "min": 5.0,
+      "max": 54.0
+    },
+    "Insulin": {
+      "mean": 102.65,
+      "std": 71.58,
+      "min": 0.0,
+      "max": 382.4
+    },
+    "BMI": {
+      "mean": 31.15,
+      "std": 6.83,
+      "min": 18.0,
+      "max": 53.2
+    },
+    "DiabetesPedigreeFunction": {
+      "mean": 0.53,
+      "std": 0.53,
+      "min": 0.08,
+      "max": 2.5
+    },
+    "Age": {
+      "mean": 40.73,
+      "std": 12.74,
+      "min": 21.0,
+      "max": 78.0
+    }
+  },
+  "risk_thresholds": {
+    "low": 0.3,
+    "moderate": 0.5,
+    "high": 0.7
+  },
+  "reference": "Pima Indians Diabetes Dataset \u2014 UCI ML Repository"
+}

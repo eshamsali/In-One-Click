@@ -1,0 +1,1543 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StatLab — Statistical Analysis with SPSS Syntax</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .syntax-editor-panel {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border2);
+      overflow: hidden;
+      margin-top: 0;
+    }
+    .syntax-header {
+      background: var(--surface2);
+      padding: 12px 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+    .syntax-textarea {
+      width: 100%;
+      background: #0b0f1a;
+      border: none;
+      padding: 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--green);
+      resize: vertical;
+      outline: none;
+      line-height: 1.6;
+      min-height: 200px;
+    }
+    .syntax-textarea:focus {
+      background: #0c1120;
+    }
+    .syntax-actions {
+      padding: 12px 20px;
+      display: flex;
+      gap: 12px;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .syntax-feedback {
+      padding: 12px 20px;
+      font-size: 12px;
+      color: var(--amber);
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,0.2);
+      font-family: var(--mono);
+    }
+    .btn-sm {
+      background: var(--border2);
+      border: none;
+      padding: 6px 16px;
+      border-radius: 20px;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    .btn-sm.primary { background: var(--blue); }
+    .btn-sm:hover { opacity: 0.85; transform: translateY(-1px); }
+    .view-tab[data-view="syntax"] { font-family: var(--mono); }
+
+    /* ── Improved toolbar button sizing ── */
+    .toolbar-btn svg { vertical-align: middle; flex-shrink: 0; }
+
+    /* ── Analysis modal icon colors ── */
+    .analysis-option[data-type="descriptive"] .analysis-icon { color: var(--blue); }
+    .analysis-option[data-type="frequency"]   .analysis-icon { color: var(--green); }
+    .analysis-option[data-type="correlation"] .analysis-icon { color: var(--purple); }
+    .analysis-option[data-type="ztest"]       .analysis-icon { color: var(--cyan); }
+    .analysis-option[data-type="ttest"]       .analysis-icon { color: var(--amber); }
+
+    /* ── Better output header with icon alignment ── */
+    .output-header span { display: flex; align-items: center; gap: 6px; }
+    .output-header svg  { flex-shrink: 0; opacity: 0.8; }
+
+    /* ── Spinning loader ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { animation: spin 1s linear infinite; }
+
+    /* ── Status bar improvements ── */
+    .status-item { letter-spacing: 0.02em; }
+
+    /* ── Variable view type badge improvements ── */
+    .type-numeric::before { content: ""; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--cyan); margin-right:5px; vertical-align:middle; }
+    .type-string::before  { content: ""; display:inline-block; width:6px; height:6px; border-radius:2px; background:var(--purple); margin-right:5px; vertical-align:middle; }
+
+    /* ── Toolbar primary button glow ── */
+    .toolbar-btn.primary:hover {
+      box-shadow: 0 0 20px rgba(79,163,255,0.25);
+    }
+
+    /* ── Output section header cleaner ── */
+    .output-header {
+      padding: 11px 18px;
+    }
+    .output-title, .output-header > span:first-child {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── View tabs stronger active indicator ── */
+    .view-tab.active {
+      color: var(--blue);
+      border-bottom: 2px solid var(--blue);
+      font-weight: 700;
+    }
+
+    /* ── Result badge improvements ── */
+    .result-badge { font-size: 13px; font-weight: 500; }
+    .result-badge.sig   { box-shadow: 0 0 12px rgba(0,229,163,0.15); }
+    .result-badge.nosig { box-shadow: 0 0 12px rgba(255,107,122,0.15); }
+
+    /* ── Stat cell value color refinements ── */
+    .stat-cell-val.val-mean { color: var(--blue); }
+    .stat-cell-val.val-sd   { color: var(--purple); }
+    .stat-cell-val.val-skew { color: var(--amber); }
+    .stat-cell-val.val-kurt { color: var(--cyan); }
+
+    /* ── Upload box icon container ── */
+    .upload-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="workspace-page">
+
+<header class="header">
+  <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">
+    <div class="logo-icon">SL</div>
+    StatLab
+  </div>
+  <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav-menu">
+    <a href="index.html" class="nav-link" onclick="toggleSidebar()">Home</a>
+    <a href="index.html#features" class="nav-link" onclick="toggleSidebar()">Features</a>
+    <a href="index.html#about" class="nav-link" onclick="toggleSidebar()">About</a>
+    <a href="index.html#how-it-works" class="nav-link" onclick="toggleSidebar()">How It Works</a>
+    <div id="mobileAuthContainer" class="mobile-auth-btn"></div>
+  </nav>
+  <div class="header-right">
+    <div class="toolbar-sep"></div>
+    <button class="toolbar-btn" onclick="location.href='index.html'">Home</button>
+    <button class="toolbar-btn" onclick="location.href='profile.html'">Profile</button>
+    <button class="toolbar-btn primary" onclick="location.href='auth.html'">Login</button>
+  </div>
+</header>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="toolbar">
+  <button class="toolbar-btn primary" onclick="document.getElementById('fileInput').click()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Open File</button>
+  <div class="toolbar-sep"></div>
+  <button class="toolbar-btn" id="analyzeBtn" disabled onclick="openAnalyze()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Analyze</button>
+  <button class="toolbar-btn" id="predictBtn" disabled onclick="runPredict()" style="color:var(--blue);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> Predict</button>
+  <button class="toolbar-btn" id="exportBtn" disabled onclick="exportResults()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export PDF</button>
+  <div class="toolbar-sep"></div>
+  <span class="file-info" id="fileInfo">No file opened</span>
+  <button class="toolbar-btn" id="changeFileBtn" style="display:none; color:var(--red);" onclick="clearSavedData()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Change File</button>
+  <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleFile(event)" />
+</div>
+
+<div class="view-tabs">
+  <div class="view-tab active" data-view="data" onclick="switchView('data',this)">Data View</div>
+  <div class="view-tab" data-view="variable" onclick="switchView('variable',this)">Variable View</div>
+  <div class="view-tab" data-view="output" onclick="switchView('output',this)">Output</div>
+  <div class="view-tab" data-view="syntax" onclick="switchView('syntax',this)"> Syntax Editor</div>
+</div>
+
+<div class="content">
+  <div class="upload-screen" id="uploadScreen">
+    <div class="upload-box" id="uploadBox" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+      <div class="upload-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <div class="upload-title">Upload Data File</div>
+      <div class="upload-sub">Drag & drop file here<br />or click to select</div>
+      <div class="upload-formats"><span class="fmt-badge">.xlsx</span><span class="fmt-badge">.xls</span><span class="fmt-badge">.csv</span></div>
+    </div>
+  </div>
+
+  <div class="table-view" id="dataView"><table class="data-table" id="dataTable"><thead id="dataHeader"></thead><tbody id="dataBody"></tbody></table></div>
+  <div class="table-view" id="variableView"><table class="var-table"><thead><tr><th>#</th><th>Name</th><th>Type</th><th>Missing</th><th>Min</th><th>Max</th><th>Label</th></tr></thead><tbody id="varBody"></tbody></table></div>
+  <div class="output-view" id="outputView"><div id="outputContent"><div class="no-data">Load a file and click Analyze or use Syntax Editor</div></div></div>
+
+  <div class="table-view" id="syntaxView">
+    <div class="syntax-editor-panel" style="display:flex;flex-direction:column;height:100%;min-height:500px;">
+
+      <!-- Header -->
+      <div class="syntax-header">
+        <span style="display:flex;align-items:center;gap:8px;">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="var(--blue)"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          IBM SPSS Syntax Editor
+        </span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span id="syntaxDatasetLabel" style="font-size:11px;color:var(--text3);font-family:var(--mono);">No dataset loaded</span>
+          <span style="font-size:11px;color:var(--text3);">*Syntax2 - StatLab</span>
+        </div>
+      </div>
+
+      <!-- AI Assistant Bar -->
+      <div id="aiAssistBar" style="background:linear-gradient(90deg,rgba(79,163,255,0.08),rgba(168,126,255,0.08));border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:10px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        <input id="aiSyntaxInput" style="flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:12px;font-family:var(--mono);" placeholder='Ask AI: "Compare glucose between diabetic and non-diabetic groups"' />
+        <button class="btn-sm primary" onclick="askAISyntax()" style="padding:4px 12px;font-size:11px;white-space:nowrap;">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate
+        </button>
+      </div>
+
+      <!-- Column Chips -->
+      <div id="syntaxColChips" style="padding:8px 16px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;min-height:36px;align-items:center;">
+        <span style="font-size:10px;color:var(--text3);margin-right:4px;">COLUMNS:</span>
+        <span style="font-size:10px;color:var(--text3);font-style:italic;">Load a dataset to see available columns</span>
+      </div>
+
+      <!-- Editor + Output split -->
+      <div style="display:flex;flex:1;overflow:hidden;min-height:300px;">
+        <!-- Textarea with line numbers -->
+        <div style="position:relative;flex:1;display:flex;flex-direction:column;">
+          <div style="display:flex;flex:1;overflow:hidden;">
+            <div id="syntaxLineNums" style="background:#070b14;padding:20px 10px 20px 12px;font-family:var(--mono);font-size:13px;line-height:1.6;color:#3a4a6a;user-select:none;min-width:36px;text-align:right;border-right:1px solid #1a2240;">1</div>
+            <textarea id="syntaxCode" class="syntax-textarea" style="flex:1;resize:none;border-radius:0;min-height:unset;" spellcheck="false"
+              placeholder="DESCRIPTIVES VARIABLES=Glucose,BMI,Age /STATISTICS=MEAN STDDEV MIN MAX.&#10;FREQUENCIES VARIABLES=Outcome /BARCHART.&#10;CORRELATIONS VARIABLES=Glucose,BMI,Age,Insulin.&#10;T-TEST GROUPS=Outcome(0 1) /VARIABLES=Glucose."
+              oninput="updateLineNums()" onscroll="syncLineNumScroll(this)"></textarea>
+          </div>
+        </div>
+
+        <!-- Syntax Results Panel -->
+        <div id="syntaxResultPanel" style="width:0;overflow:hidden;transition:width 0.3s ease;border-left:1px solid var(--border);background:var(--surface2);">
+          <div style="padding:12px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--text2);display:flex;justify-content:space-between;align-items:center;">
+            <span>RESULTS</span>
+            <button onclick="closeSyntaxResults()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;line-height:1;">×</button>
+          </div>
+          <div id="syntaxResultContent" style="padding:16px;overflow-y:auto;height:calc(100% - 44px);font-family:var(--mono);font-size:12px;"></div>
+        </div>
+      </div>
+
+      <!-- Actions Bar -->
+      <div class="syntax-actions" style="justify-content:space-between;">
+        <div style="display:flex;gap:8px;">
+          <button class="btn-sm primary" onclick="runSyntaxCommand()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Run (F5)
+          </button>
+          <button class="btn-sm" onclick="clearSyntax()">Clear</button>
+          <button class="btn-sm" onclick="insertDiabetesExample()">Diabetes Example</button>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-sm" onclick="runSyntaxAndShowOutput()" style="color:var(--green);">→ Show in Output</button>
+        </div>
+      </div>
+      <div id="syntaxFeedback" class="syntax-feedback">Ready — type SPSS commands or use AI assistant above</div>
+    </div>
+  </div>
+
+  <div class="analyze-panel" id="analyzePanel"><div class="analyze-modal"><div class="modal-header"><span>Select Analysis Type</span><button class="modal-close" onclick="closeAnalyze()">×</button></div><div class="modal-body"><div class="analysis-option" data-type="descriptive" onclick="runAnalysis('descriptive')"><div class="analysis-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div><h4>Descriptive Statistics</h4><p>Mean · StdDev · Skewness · Kurtosis</p></div></div>
+  <div class="analysis-option" data-type="frequency" onclick="runAnalysis('frequency')"><div class="analysis-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div><div><h4>Frequency Analysis</h4><p>Frequency distribution of categorical variables</p></div></div><div class="analysis-option" data-type="correlation" onclick="runAnalysis('correlation')"><div class="analysis-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div><div><h4>Correlation</h4><p>Pearson correlation matrix</p></div></div>
+  
+  <div class="analysis-option" data-type="ztest" onclick="openZTestModal()">
+  <div class="analysis-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+  <div><h4>Z-Test (Proportions)</h4><p>One‑sample / Two‑sample · One‑tailed / Two‑tailed</p></div>
+</div>
+<div class="analysis-option" data-type="ttest" onclick="runAnalysis('ttest')">
+  <div class="analysis-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+  <div><h4>Independent T-Test</h4><p>Compare means of two groups</p></div>
+</div></div></div></div>
+</div>
+
+<!-- Z-Test Modal -->
+<div class="analyze-panel" id="ztestPanel">
+  <div class="analyze-modal">
+    <div class="modal-header">
+      <span style="display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Z-Test for Proportions</span>
+      <button class="modal-close" onclick="closeZTestModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- Test Type -->
+      <div>
+        <label style="font-size:12px; color:var(--text2); margin-bottom:6px; display:block;">Test Type</label>
+        <select id="ztestType" style="width:100%; background:var(--surface2); border:1px solid var(--border); padding:10px; border-radius:10px; color:var(--text);">
+          <option value="one_sample">One-sample (proportion vs fixed p₀)</option>
+          <option value="two_sample">Two-sample (compare two proportions)</option>
+        </select>
+      </div>
+
+      <!-- One-sample Fields -->
+      <div id="ztestOneSampleFields">
+        <label style="font-size:12px; color:var(--text2); margin-bottom:6px; display:block;">Column (binary 0/1 or two categories)</label>
+        <select id="ztestColumn" style="width:100%; background:var(--surface2); border:1px solid var(--border); padding:10px; border-radius:10px; color:var(--text);"></select>
+        
+        <label style="font-size:12px; color:var(--text2); margin-bottom:6px; display:block; margin-top:12px;">Hypothesized proportion (p₀)</label>
+        <input type="number" id="ztestP0" step="0.01" value="0.5" style="width:100%; background:var(--surface2); border:1px solid var(--border); padding:10px; border-radius:10px; color:var(--text);">
+      </div>
+
+      <!-- Two-sample Fields (hidden by default) -->
+      <div id="ztestTwoSampleFields" style="display:none;">
+        <label style="font-size:12px; color:var(--text2); margin-bottom:6px; display:block;">Group column (binary, e.g., Treatment/Control)</label>
+        <select id="ztestGroupCol" style="width:100%; background:var(--surface2); border:1px solid var(--border); padding:10px; border-radius:10px; color:var(--text);"></select>
+        
+        <label style="font-size:12px; color:var(--text2); margin-bottom:6px; display:block; margin-top:12px;">Success/event column</label>
+        <select id="ztestSuccessCol" style="width:100%; background:var(--surface2); border:1px solid var(--border); padding:10px; border-radius:10px; color:var(--text);"></select>
+      </div>
+
+      <!-- Alternative Hypothesis -->
+      <div>
+        <label style="font-size:12px; color:var(--text2); margin-bottom:6px; display:block;">Alternative Hypothesis</label>
+        <select id="ztestAlternative" style="width:100%; background:var(--surface2); border:1px solid var(--border); padding:10px; border-radius:10px; color:var(--text);">
+          <option value="two-sided">Two-tailed (p ≠ p₀ / p₁ ≠ p₂)</option>
+          <option value="greater">One-tailed (greater / p₁ > p₂)</option>
+          <option value="less">One-tailed (less / p₁ < p₂)</option>
+        </select>
+      </div>
+
+      <!-- Buttons -->
+      <div style="display:flex; gap:12px; margin-top:8px;">
+        <button class="btn-sm primary" style="flex:1;" onclick="runZTest()"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Run Z-Test</button>
+        <button class="btn-sm" onclick="closeZTestModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="statusbar">
+  <div class="status-item"><span class="status-dot ready" id="statusDot"></span><span id="statusMsg">Ready</span></div>
+  <div class="status-item">Rows: <span id="statusRows">0</span></div>
+  <div class="status-item">Columns: <span id="statusCols">0</span></div>
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+  let appData = { headers: [], rows: [], fileName: null };
+  let currentView = "data";
+  let charts = [];
+
+  function setStatus(msg, state = "ready") {
+    document.getElementById("statusMsg").textContent = msg;
+    const dot = document.getElementById("statusDot");
+    dot.className = "status-dot " + state;
+  }
+
+  function toggleSidebar() {
+    if (window.innerWidth > 768) return;
+    document.querySelector(".nav-menu").classList.toggle("open");
+    document.querySelector(".sidebar-overlay").classList.toggle("open");
+    document.querySelector(".mobile-toggle").classList.toggle("open");
+  }
+
+  function checkAuth() {
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    const headerRight = document.querySelector(".header-right");
+    const mobileAuth = document.getElementById("mobileAuthContainer");
+    if (isLoggedIn) {
+      headerRight.innerHTML = `<div class="toolbar-sep"></div><button class="toolbar-btn" onclick="location.href='index.html'">Home</button><button class="toolbar-btn primary" onclick="location.href='profile.html'">Profile</button>`;
+      if (mobileAuth) mobileAuth.innerHTML = `<button class="toolbar-btn primary" style="width:100%;justify-content:center;padding:12px;" onclick="location.href='profile.html'">Profile</button>`;
+    } else {
+      headerRight.innerHTML = `<div class="toolbar-sep"></div><button class="toolbar-btn" onclick="location.href='index.html'">Home</button><button class="toolbar-btn primary" onclick="location.href='auth.html'">Login</button>`;
+      if (mobileAuth) mobileAuth.innerHTML = `<button class="toolbar-btn primary" style="width:100%;justify-content:center;padding:12px;" onclick="location.href='auth.html'">Login</button>`;
+    }
+  }
+
+  function switchView(view, tab) {
+    currentView = view;
+    document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById("dataView").classList.toggle("active", view === "data");
+    document.getElementById("variableView").classList.toggle("active", view === "variable");
+    document.getElementById("outputView").classList.toggle("active", view === "output");
+    document.getElementById("syntaxView").classList.toggle("active", view === "syntax");
+    const noData = appData.rows.length === 0;
+    document.getElementById("uploadScreen").style.display = (noData && view === "data") ? "flex" : "none";
+  }
+
+  function handleDrop(e) { e.preventDefault(); document.getElementById("uploadBox").classList.remove("drag"); const file = e.dataTransfer.files[0]; if (file) processFile(file); }
+  function handleFile(e) { const file = e.target.files[0]; if (file) processFile(file); }
+
+  function processFile(file) {
+    const reader = new FileReader();
+    const isCSV = file.name.toLowerCase().endsWith(".csv");
+    setStatus("Reading file...", "loading");
+    reader.onload = function (e) {
+      try {
+        let wb = isCSV ? XLSX.read(e.target.result, { type: "string" }) : XLSX.read(new Uint8Array(e.target.result), { type: "array" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+        if (json.length < 2) { setStatus("Error: empty file", "ready"); return; }
+        appData.headers = json[0].map(h => String(h).trim());
+        appData.rows = json.slice(1).filter(r => r.some(c => c !== "" && c !== null && c !== undefined));
+        appData.fileName = file.name;
+        renderDataView(); 
+        renderVariableView();
+        document.getElementById("uploadScreen").style.display = "none";
+        document.getElementById("dataView").classList.add("active");
+        document.querySelectorAll(".view-tab")[0].classList.add("active");
+        document.getElementById("fileInfo").innerHTML = `${file.name} · ${appData.rows.length} rows · ${appData.headers.length} cols`;
+        document.getElementById("statusRows").innerText = appData.rows.length;
+        document.getElementById("statusCols").innerText = appData.headers.length;
+        ["analyzeBtn", "exportBtn", "predictBtn"].forEach(id => document.getElementById(id).disabled = false);
+        document.getElementById("changeFileBtn").style.display = "flex";
+        setStatus("File loaded successfully", "ready");
+        localStorage.setItem("savedData", JSON.stringify({ headers: appData.headers, rows: appData.rows, fileName: file.name }));
+        addActivity("upload", `Uploaded: ${file.name}`);
+        updateSyntaxDatasetInfo();
+      } catch(err) {
+        console.error(err);
+        setStatus("Error reading file", "ready");
+      }
+    };
+    if (isCSV) reader.readAsText(file, "UTF-8");
+    else reader.readAsArrayBuffer(file);
+  }
+
+  function loadSavedData() {
+    const saved = localStorage.getItem("savedData");
+    if (saved) {
+      const data = JSON.parse(saved);
+      appData.headers = data.headers; appData.rows = data.rows; appData.fileName = data.fileName;
+      renderDataView(); renderVariableView();
+      document.getElementById("uploadScreen").style.display = "none";
+      document.getElementById("dataView").classList.add("active");
+      document.querySelectorAll(".view-tab")[0].classList.add("active");
+      document.getElementById("fileInfo").innerHTML = `${data.fileName} · ${data.rows.length} rows · ${data.headers.length} cols`;
+      document.getElementById("statusRows").innerText = data.rows.length;
+      document.getElementById("statusCols").innerText = data.headers.length;
+      ["analyzeBtn", "exportBtn", "predictBtn"].forEach(id => document.getElementById(id).disabled = false);
+      document.getElementById("changeFileBtn").style.display = "flex";
+      setStatus("Saved data restored", "ready");
+      updateSyntaxDatasetInfo();
+    }
+  }
+
+  function clearSavedData() { localStorage.removeItem("savedData"); location.reload(); }
+
+  function addActivity(type, text) {
+    const activities = JSON.parse(localStorage.getItem("userActivity") || "[]");
+    activities.unshift({ type, text, time: new Date().toISOString() });
+    localStorage.setItem("userActivity", JSON.stringify(activities.slice(0, 10)));
+  }
+
+  function renderDataView() {
+    const headerRow = document.getElementById("dataHeader");
+    const body = document.getElementById("dataBody");
+    if (!appData.headers.length) return;
+    headerRow.innerHTML = "<th>#</th>" + appData.headers.map(h => `<th>${h.length > 14 ? h.slice(0,13)+"…" : h}</th>`).join("");
+    const rows = appData.rows.slice(0, 500);
+    body.innerHTML = rows.map((row,i) => `<tr><td>${i+1}</td>${appData.headers.map((_,j) => { const val = row[j] ?? ""; const isEmpty = val === ""; const isNum = !isEmpty && !isNaN(Number(val)); return `<td class="${isEmpty ? "missing" : isNum ? "numeric" : ""}">${isEmpty ? "—" : val}</td>`; }).join("")}</tr>`).join("");
+    if (appData.rows.length > 500) body.innerHTML += `<tr><td colspan="${appData.headers.length+1}" style="text-align:center;color:var(--amber);padding:12px;">Showing first 500 rows only</td></tr>`;
+  }
+
+  function renderVariableView() {
+    const body = document.getElementById("varBody");
+    body.innerHTML = appData.headers.map((name,i) => {
+      const vals = appData.rows.map(r => r[i]).filter(v => v !== "" && v !== null);
+      const numericVals = vals.filter(v => !isNaN(Number(v))).map(Number);
+      const isNumeric = numericVals.length === vals.length && vals.length > 0;
+      const missing = appData.rows.length - vals.length;
+      const minVal = isNumeric && numericVals.length ? Math.min(...numericVals).toFixed(2) : "—";
+      const maxVal = isNumeric && numericVals.length ? Math.max(...numericVals).toFixed(2) : "—";
+      return `<tr><td>${i+1}</td><td style="font-weight:500;">${name}</td><td><span class="type-badge ${isNumeric ? 'type-numeric' : 'type-string'}">${isNumeric ? "Numeric" : "String"}</span></td><td style="color:${missing ? 'var(--amber)' : 'var(--green)'}">${missing ? `${missing}` : "✓ 0"}</td><td style="color:var(--cyan);">${minVal}</td><td style="color:var(--cyan);">${maxVal}</td><td style="color:var(--text3);">${name}</td></tr>`;
+    }).join("");
+  }
+
+  function openAnalyze() { if (appData.rows.length) document.getElementById("analyzePanel").classList.add("open"); }
+  function closeAnalyze() { document.getElementById("analyzePanel").classList.remove("open"); }
+
+  // Analysis — all operations route through Flask → analysis.py
+
+  const API = 'http://localhost:5000';
+
+  // ── Predict: يبعت الملف لـ /predict مباشرة ──────────────
+  async function runPredict() {
+    if (!appData.rows.length) {
+      setStatus('Load a file first', 'ready');
+      return;
+    }
+    switchView('output', document.querySelectorAll('.view-tab')[2]);
+    setStatus('Running prediction...', 'processing');
+
+    try {
+      // بناء CSV من appData عشان نبعته للـ backend
+      const csvContent = [appData.headers.join(','),
+        ...appData.rows.map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))
+      ].join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const formData = new FormData();
+      formData.append('file', blob, 'data.csv');
+
+      const res = await fetch(API + '/predict', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const json = await res.json();
+
+      if (!json.success) throw new Error(json.error || 'Prediction failed');
+
+      const pred = json.data.prediction;
+      const s = pred.summary || {};
+      const rd = s.risk_distribution || {};
+
+      // عرض النتيجة في الـ output
+      document.getElementById('outputContent').innerHTML = `
+        <div class="output-section">
+          <div class="output-title">🧠 AI Prediction — ${pred.display_name || pred.disease}</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;">
+            <div class="stat-card"><div style="font-size:22px;font-weight:700;color:var(--red);">${s.predicted_diabetic ?? '—'}</div><div style="font-size:11px;color:var(--text3);margin-top:4px;">Predicted Positive</div></div>
+            <div class="stat-card"><div style="font-size:22px;font-weight:700;color:var(--green);">${s.predicted_non_diabetic ?? '—'}</div><div style="font-size:11px;color:var(--text3);margin-top:4px;">Predicted Negative</div></div>
+            <div class="stat-card"><div style="font-size:22px;font-weight:700;color:var(--blue);">${s.avg_probability ?? '—'}%</div><div style="font-size:11px;color:var(--text3);margin-top:4px;">Avg. Probability</div></div>
+            <div class="stat-card"><div style="font-size:22px;font-weight:700;color:var(--amber);">${s.prevalence_pct ?? '—'}%</div><div style="font-size:11px;color:var(--text3);margin-top:4px;">Prevalence</div></div>
+          </div>
+          <div class="output-sub" style="margin-bottom:8px;">Risk Distribution</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;">
+            ${[['Low','low','var(--green)'],['Moderate','moderate','var(--amber)'],['High','high','var(--red)'],['Very High','very_high','#ff1744']].map(([label,key,color])=>`
+              <div class="stat-card" style="text-align:center;">
+                <div style="font-size:20px;font-weight:700;color:${color};">${rd[key] ?? 0}</div>
+                <div style="font-size:11px;color:var(--text3);">${label}</div>
+              </div>`).join('')}
+          </div>
+          ${pred.actual_comparison ? `
+            <div class="output-sub" style="margin-bottom:8px;">Model Performance on This Dataset</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;">
+              <div class="stat-card"><div style="font-size:20px;font-weight:700;color:var(--blue);">${pred.actual_comparison.accuracy}%</div><div style="font-size:11px;color:var(--text3);">Accuracy</div></div>
+              <div class="stat-card"><div style="font-size:20px;font-weight:700;color:var(--blue);">${pred.actual_comparison.auc_roc}</div><div style="font-size:11px;color:var(--text3);">AUC-ROC</div></div>
+              <div class="stat-card"><div style="font-size:20px;font-weight:700;color:var(--blue);">${pred.model_accuracy}%</div><div style="font-size:11px;color:var(--text3);">CV Accuracy</div></div>
+            </div>` : ''}
+          <div style="font-size:11px;color:var(--text3);margin-top:16px;padding:10px;background:rgba(255,255,255,0.03);border-radius:6px;border:1px solid var(--border);">
+            ⚠️ ${pred.disclaimer || 'For research purposes only — not a medical diagnosis.'}
+          </div>
+        </div>`;
+
+      addActivity('analysis', `AI Prediction: ${pred.display_name} — ${s.predicted_diabetic} positive out of ${s.total_cases}`);
+      setStatus(`Prediction complete — ${s.total_cases} cases`, 'ready');
+
+    } catch (err) {
+      const isOffline = err.message.includes('fetch') || err.message.includes('Failed');
+      document.getElementById('outputContent').innerHTML = `
+        <div class="output-section">
+          <div class="output-title" style="color:var(--red);">⚠ Prediction Error</div>
+          <p style="color:var(--text2);font-size:13px;">${isOffline ? 'Backend server is not running. Start it with <code>python analysis.py</code>' : err.message}</p>
+        </div>`;
+      setStatus('Prediction failed', 'ready');
+    }
+  }
+
+  async function runAnalysis(type) {
+    closeAnalyze();
+    charts.forEach(c => c.destroy()); charts = [];
+
+    if (!appData.rows.length) {
+      setStatus('Load a file first', 'ready');
+      return;
+    }
+
+    setStatus(`Running ${type} via Python...`, 'loading');
+    switchView('output', document.querySelectorAll('.view-tab')[2]);
+    document.getElementById('outputContent').innerHTML = `
+      <div class="no-data" style="padding:60px;">
+        <div style="margin-bottom:12px;opacity:0.5;color:var(--blue);"><svg class="spinner" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>
+        <p>Sending data to Python analysis engine...</p>
+      </div>`;
+
+    try {
+      // Convert data to CSV and send to Flask
+      const csvRows = [appData.headers.join(',')];
+      appData.rows.forEach(row => {
+        csvRows.push(appData.headers.map((_,i) => {
+          const v = row[i] ?? '';
+          return String(v).includes(',') ? `"${v}"` : v;
+        }).join(','));
+      });
+      const csvBlob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+      const formData = new FormData();
+      formData.append('file', csvBlob, (appData.fileName || 'data') + '.csv');
+      formData.append('domain', document.querySelector('.domain-tab.active')?.textContent || 'medical');
+
+      let endpoint = '/upload';
+      if (type === 'ttest')      endpoint = '/analyze/ttest';
+      else if (type === 'chisq') endpoint = '/analyze/chisquare';
+
+      const res = await fetch(API + endpoint, { method: 'POST', body: formData });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const json = await res.json();
+
+      if (!json.success) throw new Error(json.error || 'Analysis failed');
+
+      renderBackendResults(type, json.data);
+      addActivity('analysis', `Performed: ${type} analysis via Python`);
+      setStatus(`${type} complete`, 'ready');
+
+    } catch (err) {
+      const isOffline = err.message.includes('fetch') || err.message.includes('Failed');
+      document.getElementById('outputContent').innerHTML = `
+        <div class="output-section">
+          <div class="output-header">
+            <span style="color:var(--red);">! ${isOffline ? 'Flask server not running' : 'Analysis error'}</span>
+          </div>
+          <div style="padding:24px;font-size:13px;color:var(--text2);line-height:1.8;">
+            ${isOffline
+              ? `<strong style="color:var(--text);">To start the server:</strong><br>
+                 Open terminal in the backend folder and run:<br>
+                 <code style="background:var(--surface2);padding:8px 14px;border-radius:6px;display:inline-block;margin-top:8px;color:var(--green);">python app.py</code>`
+              : `Error: ${err.message}`
+            }
+          </div>
+        </div>`;
+      setStatus('Error — is Flask running?', 'ready');
+    }
+  }
+
+  function renderBackendResults(type, data) {
+    const out = document.getElementById('outputContent');
+    const COLORS = ['#4fa3ff','#00e5a3','#ffb84d','#ff6b7a','#a87eff','#00d4f5'];
+    let html = '';
+
+    if (type === 'descriptive' || type === 'frequency' || !type) {
+      // ── Descriptive
+      const desc = data.descriptive || {};
+      Object.entries(desc).forEach(([col, s]) => {
+        html += `<div class="output-section">
+          <div class="output-header">
+            <span> ${col}</span>
+            <span class="output-sub">N=${s.N} · Missing=${s.Missing}</span>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-cell"><div class="stat-cell-label">Mean</div><div class="stat-cell-val val-mean">${s.Mean}</div></div>
+            <div class="stat-cell"><div class="stat-cell-label">Median</div><div class="stat-cell-val">${s.Median}</div></div>
+            <div class="stat-cell"><div class="stat-cell-label">Std Dev</div><div class="stat-cell-val val-sd">${s.Std_Dev}</div></div>
+            <div class="stat-cell"><div class="stat-cell-label">Std Error</div><div class="stat-cell-val">${s.Std_Error}</div></div>
+            <div class="stat-cell"><div class="stat-cell-label">Min</div><div class="stat-cell-val">${s.Min}</div></div>
+            <div class="stat-cell"><div class="stat-cell-label">Max</div><div class="stat-cell-val">${s.Max}</div></div>
+            <div class="stat-cell"><div class="stat-cell-label">Range</div><div class="stat-cell-val">${s.Range}</div></div>
+            <div class="stat-cell"><div class="stat-cell-label">Skewness</div><div class="stat-cell-val val-skew">${s.Skewness}</div></div>
+            <div class="stat-cell"><div class="stat-cell-label">Kurtosis</div><div class="stat-cell-val val-kurt">${s.Kurtosis}</div></div>
+          </div>
+        </div>`;
+      });
+
+      // Means bar chart
+      if (Object.keys(desc).length > 0) {
+        html += `<div class="output-section"><div class="chart-container"><canvas id="descChart" style="height:260px;" role="img" aria-label="Means chart"></canvas></div></div>`;
+      }
+
+      // ── Frequency
+      const freq = data.frequency || {};
+      Object.entries(freq).slice(0,3).forEach(([col, items], idx) => {
+        const total = items.reduce((a,b) => a + b.count, 0);
+        html += `<div class="output-section">
+          <div class="output-header">
+            <span> ${col}</span>
+            <span class="output-sub">N=${total}</span>
+          </div>
+          <div style="padding:16px;overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead><tr>
+                <th style="padding:8px;text-align:left;color:var(--text2);border-bottom:1px solid var(--border2);">Value</th>
+                <th style="padding:8px;color:var(--text2);border-bottom:1px solid var(--border2);">Frequency</th>
+                <th style="padding:8px;color:var(--text2);border-bottom:1px solid var(--border2);">%</th>
+                <th style="padding:8px;color:var(--text2);border-bottom:1px solid var(--border2);">Cumulative %</th>
+              </tr></thead>
+              <tbody>${items.map(item => `
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:8px;">${item.value}</td>
+                  <td style="padding:8px;color:var(--cyan);">${item.count}</td>
+                  <td style="padding:8px;color:var(--green);">${item.percentage}%</td>
+                  <td style="padding:8px;color:var(--text2);">${item.cumulative}%</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div class="chart-container"><canvas id="freqChart${idx}" style="height:200px;" role="img" aria-label="Frequency chart for ${col}"></canvas></div>
+        </div>`;
+      });
+    }
+
+    // ── Correlation
+    if (type === 'correlation') {
+      const corr = data.correlation || {};
+      const cols = corr.columns || [];
+      const matrix = corr.correlation_matrix || {};
+      const pvals  = corr.pvalue_matrix || {};
+
+      html += `<div class="output-section">
+        <div class="output-header">
+          <span style="display:flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Pearson Correlation Matrix</span>
+          <span class="output-sub">** p&lt;0.01 · * p&lt;0.05</span>
+        </div>
+        <div style="overflow-x:auto;padding:16px;">
+          <table style="border-collapse:collapse;font-size:12px;">
+            <thead><tr>
+              <th style="padding:8px;"></th>
+              ${cols.map(c=>`<th style="padding:8px;color:var(--text2);white-space:nowrap;">${c.slice(0,10)}</th>`).join('')}
+            </tr></thead>
+            <tbody>${cols.map(ci=>`
+              <tr>
+                <td style="padding:8px;font-weight:600;color:var(--text2);white-space:nowrap;">${ci.slice(0,12)}</td>
+                ${cols.map(cj => {
+                  const r = matrix[ci]?.[cj] ?? 0;
+                  const p = pvals[ci]?.[cj] ?? 1;
+                  const abs = Math.abs(r);
+                  let cls = '';
+                  if (ci===cj) cls='corr-diag';
+                  else if (r>0.7) cls='corr-high-pos';
+                  else if (r>0.4) cls='corr-mid-pos';
+                  else if (r<-0.7) cls='corr-high-neg';
+                  else if (r<-0.4) cls='corr-mid-neg';
+                  const sig = p<0.01 ? '**' : p<0.05 ? '*' : '';
+                  return `<td class="${cls}" style="padding:8px;text-align:center;">${r.toFixed(3)}${sig}</td>`;
+                }).join('')}
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+    }
+
+    // ── T-Test
+    if (type === 'ttest') {
+      const t = data.ttest || {};
+      if (t.error) {
+        html += `<div class="output-section"><div class="output-header"><span>T-Test Error</span></div><div style="padding:20px;color:var(--red);">${t.error}</div></div>`;
+      } else {
+        const sig = t.significant;
+        html += `<div class="output-section">
+          <div class="output-header">
+            <span style="display:flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Independent T-Test — ${t.column}</span>
+            <span class="output-sub">df=${t.df}</span>
+          </div>
+          <div style="padding:20px;">
+            <div class="stats-grid">
+              <div class="stat-cell"><div class="stat-cell-label">${t.group1?.name} Mean</div><div class="stat-cell-val">${t.group1?.Mean}</div></div>
+              <div class="stat-cell"><div class="stat-cell-label">${t.group1?.name} N</div><div class="stat-cell-val">${t.group1?.N}</div></div>
+              <div class="stat-cell"><div class="stat-cell-label">${t.group1?.name} SD</div><div class="stat-cell-val">${t.group1?.SD}</div></div>
+              <div class="stat-cell"><div class="stat-cell-label">${t.group2?.name} Mean</div><div class="stat-cell-val">${t.group2?.Mean}</div></div>
+              <div class="stat-cell"><div class="stat-cell-label">${t.group2?.name} N</div><div class="stat-cell-val">${t.group2?.N}</div></div>
+              <div class="stat-cell"><div class="stat-cell-label">${t.group2?.name} SD</div><div class="stat-cell-val">${t.group2?.SD}</div></div>
+              <div class="stat-cell"><div class="stat-cell-label">t statistic</div><div class="stat-cell-val val-mean">${t.t_statistic}</div></div>
+              <div class="stat-cell"><div class="stat-cell-label">p-value</div><div class="stat-cell-val">${t.p_value}</div></div>
+            </div>
+            <div class="result-badge ${sig ? 'sig' : 'nosig'}" style="margin-top:16px;">
+              ${sig ? '<span style="color:var(--green);">Statistically significant (p &lt; 0.05)</span>' : '<span style="color:var(--red);">Not statistically significant</span>'}
+            </div>
+            <p style="font-size:11px;color:var(--text3);margin-top:12px;">${t.interpretation}</p>
+          </div>
+        </div>`;
+      }
+    }
+
+    // ── Prediction Results
+    if (data.prediction) {
+      const p   = data.prediction;
+      const s   = p.summary || {};
+      const ac  = p.actual_comparison;
+      const rd  = s.risk_distribution || {};
+
+      html += `
+      <div class="output-section" style="border:1px solid var(--blue);border-radius:10px;overflow:hidden;margin-bottom:16px;">
+        <div class="output-header" style="background:linear-gradient(90deg,rgba(79,163,255,0.15),transparent);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--blue);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            AI Prediction — ${p.display_name || p.disease}
+          </span>
+          <span style="font-size:11px;color:var(--text3);">Model Accuracy: <strong style="color:var(--green);">${p.model_accuracy}%</strong> · AUC: <strong style="color:var(--cyan);">${typeof p.model_auc === 'number' ? p.model_auc.toFixed(3) : p.model_auc}</strong></span>
+        </div>
+        <div style="padding:20px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px;">
+            <div style="background:var(--surface2);border-radius:8px;padding:14px;text-align:center;">
+              <div style="font-size:22px;font-weight:700;color:var(--text);">${s.total_cases ?? '—'}</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:4px;">Total Cases</div>
+            </div>
+            <div style="background:var(--surface2);border-radius:8px;padding:14px;text-align:center;">
+              <div style="font-size:22px;font-weight:700;color:var(--red);">${s.predicted_diabetic ?? '—'}</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:4px;">Predicted Positive</div>
+            </div>
+            <div style="background:var(--surface2);border-radius:8px;padding:14px;text-align:center;">
+              <div style="font-size:22px;font-weight:700;color:var(--green);">${s.predicted_non_diabetic ?? '—'}</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:4px;">Predicted Negative</div>
+            </div>
+            <div style="background:var(--surface2);border-radius:8px;padding:14px;text-align:center;">
+              <div style="font-size:22px;font-weight:700;color:var(--amber);">${s.prevalence_pct ?? '—'}%</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:4px;">Prevalence</div>
+            </div>
+            <div style="background:var(--surface2);border-radius:8px;padding:14px;text-align:center;">
+              <div style="font-size:22px;font-weight:700;color:var(--purple);">${s.avg_probability ?? '—'}%</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:4px;">Avg Probability</div>
+            </div>
+          </div>
+          <div style="margin-bottom:20px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;">Risk Distribution</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+              ${[['low','Low','#00e5a3'],['moderate','Moderate','#ffb84d'],['high','High','#ff8c42'],['very_high','Very High','#ff6b7a']].map(([k,label,color])=>`
+              <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center;border-top:3px solid ${color};">
+                <div style="font-size:20px;font-weight:700;color:${color};">${rd[k] ?? 0}</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:3px;">${label}</div>
+              </div>`).join('')}
+            </div>
+          </div>
+          <div style="margin-bottom:20px;">
+            <div style="height:10px;border-radius:6px;overflow:hidden;display:flex;background:var(--surface2);">
+              ${[['low','#00e5a3'],['moderate','#ffb84d'],['high','#ff8c42'],['very_high','#ff6b7a']].map(([k,color])=>{
+                const total = (rd.low||0)+(rd.moderate||0)+(rd.high||0)+(rd.very_high||0);
+                const pct = total ? ((rd[k]||0)/total*100).toFixed(1) : 0;
+                return `<div style="width:${pct}%;background:${color};transition:width 0.8s;"></div>`;
+              }).join('')}
+            </div>
+            <div style="display:flex;gap:16px;margin-top:6px;flex-wrap:wrap;">
+              ${[['low','Low','#00e5a3'],['moderate','Moderate','#ffb84d'],['high','High','#ff8c42'],['very_high','Very High','#ff6b7a']].map(([k,label,color])=>{
+                const total = (rd.low||0)+(rd.moderate||0)+(rd.high||0)+(rd.very_high||0);
+                const pct = total ? ((rd[k]||0)/total*100).toFixed(1) : 0;
+                return `<span style="font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block;"></span>${label} ${pct}%</span>`;
+              }).join('')}
+            </div>
+          </div>
+          ${ac ? `
+          <div style="margin-bottom:20px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;">Confusion Matrix — vs Actual</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:300px;">
+              <div style="background:rgba(0,229,163,0.12);border:1px solid rgba(0,229,163,0.3);border-radius:8px;padding:14px;text-align:center;">
+                <div style="font-size:20px;font-weight:700;color:var(--green);">${ac.true_negative}</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:3px;">True Negative</div>
+              </div>
+              <div style="background:rgba(255,107,122,0.12);border:1px solid rgba(255,107,122,0.3);border-radius:8px;padding:14px;text-align:center;">
+                <div style="font-size:20px;font-weight:700;color:var(--red);">${ac.false_positive}</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:3px;">False Positive</div>
+              </div>
+              <div style="background:rgba(255,107,122,0.12);border:1px solid rgba(255,107,122,0.3);border-radius:8px;padding:14px;text-align:center;">
+                <div style="font-size:20px;font-weight:700;color:var(--red);">${ac.false_negative}</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:3px;">False Negative</div>
+              </div>
+              <div style="background:rgba(0,229,163,0.12);border:1px solid rgba(0,229,163,0.3);border-radius:8px;padding:14px;text-align:center;">
+                <div style="font-size:20px;font-weight:700;color:var(--green);">${ac.true_positive}</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:3px;">True Positive</div>
+              </div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap;">
+              <span style="font-size:12px;color:var(--text2);">Accuracy: <strong style="color:var(--green);">${ac.accuracy}%</strong></span>
+              <span style="font-size:12px;color:var(--text2);">AUC-ROC: <strong style="color:var(--cyan);">${typeof ac.auc_roc === 'number' ? ac.auc_roc.toFixed(3) : ac.auc_roc}</strong></span>
+            </div>
+          </div>` : ''}
+          <div style="max-width:320px;margin:0 auto 8px;">
+            <canvas id="predPieChart" height="200" role="img" aria-label="Risk distribution pie chart"></canvas>
+          </div>
+          <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:8px;">${p.disclaimer || ''}</div>
+        </div>
+      </div>`;
+    }
+
+    out.innerHTML = html || '<div class="no-data">No results to display</div>';
+
+    // Render charts
+    requestAnimationFrame(() => {
+      // Prediction pie chart
+      const predPie = document.getElementById('predPieChart');
+      if (predPie && data.prediction) {
+        const rd = data.prediction.summary?.risk_distribution || {};
+        charts.push(new Chart(predPie, {
+          type: 'doughnut',
+          data: {
+            labels: ['Low Risk', 'Moderate', 'High', 'Very High'],
+            datasets: [{
+              data: [rd.low||0, rd.moderate||0, rd.high||0, rd.very_high||0],
+              backgroundColor: ['#00e5a3','#ffb84d','#ff8c42','#ff6b7a'],
+              borderWidth: 0,
+              hoverOffset: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: '#a0aec0', font: { size: 11 } } },
+              tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} cases` } }
+            },
+            cutout: '65%'
+          }
+        }));
+      }
+
+      const descCanvas = document.getElementById('descChart');
+      if (descCanvas && data.descriptive) {
+        const labels = Object.keys(data.descriptive).slice(0,10);
+        const means  = labels.map(k => data.descriptive[k].Mean);
+        charts.push(new Chart(descCanvas, {
+          type: 'bar',
+          data: { labels, datasets: [{ label: 'Mean', data: means, backgroundColor: COLORS, borderRadius: 6 }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+            scales: { x: { ticks: { color: '#7a8ab4', font: { size: 10 } } }, y: { ticks: { color: '#7a8ab4', font: { size: 10 } } } } }
+        }));
+      }
+
+      Object.entries(data.frequency || {}).slice(0,3).forEach(([col, items], idx) => {
+        const canvas = document.getElementById(`freqChart${idx}`);
+        if (!canvas) return;
+        charts.push(new Chart(canvas, {
+          type: 'doughnut',
+          data: { labels: items.map(i=>i.value), datasets: [{ data: items.map(i=>i.count), backgroundColor: COLORS, borderWidth: 0 }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#7a8ab4', font: { size: 10 }, boxWidth: 10 } } } }
+        }));
+      });
+    });
+  }
+
+    function exportResults() {
+    const out = document.getElementById("outputContent");
+    if (!out || out.innerText.includes("Load a file") || out.innerText.includes("Flask")) {
+      setStatus("Run an analysis first", "ready");
+      return;
+    }
+    const win = window.open("", "_blank");
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>StatLab Report</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 40px; background: #fff; color: #111; }
+        .output-section { border: 1px solid #ddd; border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+        .output-header { padding: 12px 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); }
+        .stat-cell { padding: 12px 16px; border-right: 1px solid #eee; border-bottom: 1px solid #eee; }
+        .stat-cell-label { font-size: 10px; color: #777; text-transform: uppercase; margin-bottom: 4px; }
+        .stat-cell-val { font-size: 18px; font-weight: 600; }
+        .result-badge { padding: 10px 16px; border-radius: 6px; margin: 16px; font-weight: 500; }
+        .result-badge.sig { background: #e6f9f2; color: #059669; border: 1px solid #a7f3d0; }
+        .result-badge.nosig { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 8px 12px; border-bottom: 1px solid #eee; text-align: left; }
+        h1 { font-size: 22px; margin-bottom: 8px; }
+        .meta { font-size: 13px; color: #777; margin-bottom: 32px; }
+      </style>
+    </head><body>
+      <h1>StatLab Analysis Report</h1>
+      <p class="meta">Generated: ${new Date().toLocaleString()} · Powered by StatLab + Python</p>
+      ${out.innerHTML}
+    </body></html>`);
+    setTimeout(() => win.print(), 600);
+    addActivity("export", "Exported PDF report");
+  }
+
+  // ═══════════════════════════════════════════════════════
+  //  UPGRADED SYNTAX EDITOR — Full client-side execution
+  // ═══════════════════════════════════════════════════════
+
+  function updateLineNums() {
+    const ta = document.getElementById('syntaxCode');
+    const ln = document.getElementById('syntaxLineNums');
+    const lines = ta.value.split('\n').length;
+    ln.textContent = Array.from({length: lines}, (_, i) => i + 1).join('\n');
+  }
+
+  function syncLineNumScroll(ta) {
+    document.getElementById('syntaxLineNums').scrollTop = ta.scrollTop;
+  }
+
+  function updateSyntaxDatasetInfo() {
+    const label = document.getElementById('syntaxDatasetLabel');
+    if (label && appData.headers.length) {
+      label.textContent = `${appData.fileName || 'dataset'} · ${appData.rows.length} rows · ${appData.headers.length} cols`;
+    }
+    // Update column chips
+    const chips = document.getElementById('syntaxColChips');
+    if (chips && appData.headers.length) {
+      chips.innerHTML = `<span style="font-size:10px;color:var(--text3);margin-right:4px;">COLUMNS:</span>` +
+        appData.headers.map(h => {
+          const vals = appData.rows.map(r => r[appData.headers.indexOf(h)]).filter(v => v !== '' && v !== null);
+          const isNum = vals.every(v => !isNaN(Number(v)));
+          const color = isNum ? 'var(--cyan)' : 'var(--purple)';
+          return `<span onclick="insertColName('${h}')" style="font-size:10px;font-family:var(--mono);background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:2px 7px;cursor:pointer;color:${color};transition:all 0.15s;" 
+            onmouseenter="this.style.borderColor=color" title="${isNum?'Numeric':'String'} · click to insert">${h}</span>`;
+        }).join('');
+    }
+  }
+
+  function insertColName(name) {
+    const ta = document.getElementById('syntaxCode');
+    const pos = ta.selectionStart;
+    ta.value = ta.value.slice(0, pos) + name + ta.value.slice(pos);
+    ta.focus();
+    ta.selectionStart = ta.selectionEnd = pos + name.length;
+    updateLineNums();
+  }
+
+  // ── Parse a single SPSS command line ──
+  function parseSPSSLine(line) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('*') || trimmed.startsWith('/*')) return null;
+    const upper = trimmed.toUpperCase();
+
+    // Extract VARIABLES= list
+    const varMatch = trimmed.match(/VARIABLES?\s*=\s*([\w,\s]+?)(?:\s*\/|\.|\s*$)/i);
+    const variables = varMatch ? varMatch[1].split(/[\s,]+/).filter(Boolean) : [];
+
+    // Extract GROUPS= for T-TEST
+    const groupMatch = trimmed.match(/GROUPS?\s*=\s*(\w+)\s*\(([^)]+)\)/i);
+
+    if (upper.startsWith('DESCRIPTIVES')) return { cmd: 'DESCRIPTIVES', variables };
+    if (upper.startsWith('FREQUENCIES')) return { cmd: 'FREQUENCIES', variables };
+    if (upper.startsWith('CORRELATIONS')) return { cmd: 'CORRELATIONS', variables };
+    if (upper.startsWith('T-TEST') || upper.startsWith('TTEST')) {
+      const varMatch2 = trimmed.match(/\/VARIABLES?\s*=\s*([\w,\s]+?)(?:\s*\/|\.|\s*$)/i);
+      const depVars = varMatch2 ? varMatch2[1].split(/[\s,]+/).filter(Boolean) : variables;
+      return {
+        cmd: 'TTEST',
+        groupCol: groupMatch ? groupMatch[1] : null,
+        groups: groupMatch ? groupMatch[2].split(/\s+/) : [],
+        variables: depVars
+      };
+    }
+    if (upper.startsWith('REGRESSION')) return { cmd: 'REGRESSION', variables };
+    if (upper.startsWith('MEANS')) return { cmd: 'MEANS', variables };
+    return { cmd: 'UNKNOWN', raw: trimmed };
+  }
+
+  // ── Resolve column name (case-insensitive, partial match) ──
+  function resolveCol(name) {
+    if (!name) return null;
+    const exact = appData.headers.find(h => h.toLowerCase() === name.toLowerCase());
+    if (exact) return exact;
+    return appData.headers.find(h => h.toLowerCase().includes(name.toLowerCase())) || null;
+  }
+
+  function getColValues(col) {
+    const idx = appData.headers.indexOf(col);
+    if (idx < 0) return [];
+    return appData.rows.map(r => r[idx]).filter(v => v !== '' && v !== null && v !== undefined).map(Number).filter(v => !isNaN(v));
+  }
+
+  // ── Statistics helpers ──
+  function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
+  function std(arr) { const m=mean(arr); return Math.sqrt(arr.reduce((a,b)=>a+(b-m)**2,0)/(arr.length-1)); }
+  function median(arr) { const s=[...arr].sort((a,b)=>a-b); const m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; }
+  function skewness(arr) { const m=mean(arr),s=std(arr),n=arr.length; return (n/((n-1)*(n-2)))*arr.reduce((a,b)=>a+((b-m)/s)**3,0); }
+  function kurtosis(arr) { const m=mean(arr),s=std(arr),n=arr.length; return ((n*(n+1))/((n-1)*(n-2)*(n-3)))*arr.reduce((a,b)=>a+((b-m)/s)**4,0)-(3*(n-1)**2)/((n-2)*(n-3)); }
+  function pearsonR(x,y) {
+    const mx=mean(x),my=mean(y);
+    const num=x.reduce((a,_,i)=>a+(x[i]-mx)*(y[i]-my),0);
+    const den=Math.sqrt(x.reduce((a,v)=>a+(v-mx)**2,0)*y.reduce((a,v)=>a+(v-my)**2,0));
+    return den===0?0:num/den;
+  }
+  function tTest(a,b) {
+    const na=a.length,nb=b.length,ma=mean(a),mb=mean(b),sa=std(a),sb=std(b);
+    const se=Math.sqrt(sa**2/na+sb**2/nb);
+    const t=(ma-mb)/se;
+    const df=Math.round((sa**2/na+sb**2/nb)**2/((sa**2/na)**2/(na-1)+(sb**2/nb)**2/(nb-1)));
+    // simple p approximation using t distribution
+    const p = tPValue(t, df);
+    return {t,df,p,ma,mb,sa,sb,na,nb};
+  }
+  function tPValue(t, df) {
+    // Beta function approximation for two-tailed p
+    const x = df/(df+t*t);
+    let p = 0;
+    if (df > 0) {
+      const a = df/2, b = 0.5;
+      p = incompleteBeta(x, a, b);
+    }
+    return Math.min(1, p);
+  }
+  function incompleteBeta(x, a, b) {
+    // Simple continued fraction approximation
+    if (x < 0 || x > 1) return 0;
+    if (x === 0) return 0;
+    if (x === 1) return 1;
+    const lbeta = lgamma(a) + lgamma(b) - lgamma(a+b);
+    const front = Math.exp(Math.log(x)*a + Math.log(1-x)*b - lbeta) / a;
+    return front * betaCF(x, a, b);
+  }
+  function betaCF(x, a, b) {
+    const MAXIT=100,EPS=3e-7;
+    let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;
+    if(Math.abs(d)<1e-30)d=1e-30;d=1/d;let h=d;
+    for(let m=1;m<=MAXIT;m++){
+      let m2=2*m,aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;
+      c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;h*=d*c;
+      aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;
+      c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;let del=d*c;h*=del;
+      if(Math.abs(del-1)<EPS)break;
+    }
+    return h;
+  }
+  function lgamma(x) {
+    const g=7,p=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+    if(x<0.5)return Math.log(Math.PI/Math.sin(Math.PI*x))-lgamma(1-x);
+    x--;let a=p[0];const t=x+g+0.5;for(let i=1;i<g+2;i++)a+=p[i]/(x+i);
+    return 0.5*Math.log(2*Math.PI)+(x+0.5)*Math.log(t)-t+Math.log(a);
+  }
+
+  // ── Execute one parsed command ──
+  function execCommand(parsed) {
+    if (!parsed || parsed.cmd === 'UNKNOWN') {
+      return `<div style="color:var(--amber);padding:8px 0;">⚠ Unknown command: <code>${parsed?.raw || ''}</code></div>`;
+    }
+
+    const cols = parsed.variables.map(v => resolveCol(v)).filter(Boolean);
+
+    if (parsed.cmd === 'DESCRIPTIVES') {
+      if (!cols.length) cols.push(...appData.headers.filter(h => {
+        const vals = getColValues(h); return vals.length > 0;
+      }).slice(0,5));
+      let html = `<div style="font-weight:700;color:var(--blue);margin-bottom:12px;font-size:13px;">DESCRIPTIVES</div>`;
+      cols.forEach(col => {
+        const vals = getColValues(col);
+        if (!vals.length) return;
+        const n=vals.length, m=mean(vals), sd=std(vals), med=median(vals);
+        const minV=Math.min(...vals), maxV=Math.max(...vals);
+        const sk=skewness(vals), ku=kurtosis(vals);
+        html += `
+          <div style="margin-bottom:16px;background:var(--surface);border-radius:8px;overflow:hidden;border:1px solid var(--border);">
+            <div style="padding:8px 12px;background:rgba(79,163,255,0.08);font-weight:600;font-size:12px;color:var(--blue);">${col}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);">
+              ${[['N',n],['Mean',m.toFixed(4)],['Median',med.toFixed(4)],['Std Dev',sd.toFixed(4)],['Std Error',(sd/Math.sqrt(n)).toFixed(4)],['Min',minV.toFixed(4)],['Max',maxV.toFixed(4)],['Range',(maxV-minV).toFixed(4)],['Skewness',sk.toFixed(4)],['Kurtosis',ku.toFixed(4)]].map(([l,v])=>
+                `<div style="background:var(--surface2);padding:6px 10px;"><div style="font-size:10px;color:var(--text3);">${l}</div><div style="color:var(--text);font-weight:500;">${v}</div></div>`
+              ).join('')}
+            </div>
+          </div>`;
+      });
+      return html;
+    }
+
+    if (parsed.cmd === 'FREQUENCIES') {
+      if (!cols.length) cols.push(...appData.headers.slice(0,3));
+      let html = `<div style="font-weight:700;color:var(--green);margin-bottom:12px;font-size:13px;">FREQUENCIES</div>`;
+      cols.forEach(col => {
+        const idx = appData.headers.indexOf(col);
+        if (idx < 0) return;
+        const vals = appData.rows.map(r => r[idx]).filter(v => v !== '' && v !== null);
+        const freq = {};
+        vals.forEach(v => { freq[v] = (freq[v]||0)+1; });
+        const sorted = Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+        const total = vals.length;
+        let cum = 0;
+        html += `
+          <div style="margin-bottom:16px;background:var(--surface);border-radius:8px;overflow:hidden;border:1px solid var(--border);">
+            <div style="padding:8px 12px;background:rgba(0,229,163,0.08);font-weight:600;font-size:12px;color:var(--green);">${col} <span style="font-weight:400;color:var(--text3);">N=${total}</span></div>
+            <table style="width:100%;border-collapse:collapse;font-size:11px;">
+              <thead><tr style="background:var(--surface2);">
+                <th style="padding:6px 10px;text-align:left;color:var(--text2);">Value</th>
+                <th style="padding:6px 10px;color:var(--text2);">Freq</th>
+                <th style="padding:6px 10px;color:var(--text2);">%</th>
+                <th style="padding:6px 10px;color:var(--text2);">Cum%</th>
+              </tr></thead>
+              <tbody>${sorted.slice(0,15).map(([v,c])=>{
+                const pct=(c/total*100); cum+=pct;
+                return `<tr style="border-top:1px solid var(--border);">
+                  <td style="padding:6px 10px;color:var(--text);">${v}</td>
+                  <td style="padding:6px 10px;text-align:center;color:var(--cyan);">${c}</td>
+                  <td style="padding:6px 10px;text-align:center;color:var(--green);">${pct.toFixed(1)}%</td>
+                  <td style="padding:6px 10px;text-align:center;color:var(--text3);">${cum.toFixed(1)}%</td>
+                </tr>`;
+              }).join('')}</tbody>
+            </table>
+          </div>`;
+      });
+      return html;
+    }
+
+    if (parsed.cmd === 'CORRELATIONS') {
+      const numCols = cols.length >= 2 ? cols : appData.headers.filter(h=>{const v=getColValues(h);return v.length>0;}).slice(0,6);
+      const colData = numCols.map(c=>getColValues(c));
+      let html = `<div style="font-weight:700;color:var(--purple);margin-bottom:12px;font-size:13px;">CORRELATIONS</div>
+        <div style="overflow-x:auto;"><table style="border-collapse:collapse;font-size:11px;">
+          <thead><tr><th style="padding:6px 10px;"></th>${numCols.map(c=>`<th style="padding:6px 10px;color:var(--text2);white-space:nowrap;">${c.slice(0,10)}</th>`).join('')}</tr></thead>
+          <tbody>`;
+      numCols.forEach((ci, i) => {
+        html += `<tr><td style="padding:6px 10px;font-weight:600;color:var(--text2);white-space:nowrap;">${ci.slice(0,12)}</td>`;
+        numCols.forEach((cj, j) => {
+          if (i===j) { html+=`<td style="padding:6px 10px;text-align:center;background:rgba(255,255,255,0.05);color:var(--text);">1.000</td>`; return; }
+          const minLen = Math.min(colData[i].length, colData[j].length);
+          const r = pearsonR(colData[i].slice(0,minLen), colData[j].slice(0,minLen));
+          const abs = Math.abs(r);
+          const bg = r>0.7?'rgba(0,229,163,0.15)':r>0.4?'rgba(0,229,163,0.07)':r<-0.7?'rgba(255,107,122,0.15)':r<-0.4?'rgba(255,107,122,0.07)':'transparent';
+          const col = r>0.4?'var(--green)':r<-0.4?'var(--red)':'var(--text)';
+          html+=`<td style="padding:6px 10px;text-align:center;background:${bg};color:${col};">${r.toFixed(3)}</td>`;
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      return html;
+    }
+
+    if (parsed.cmd === 'TTEST') {
+      const groupCol = resolveCol(parsed.groupCol) || appData.headers.find(h=>{
+        const vals=appData.rows.map(r=>r[appData.headers.indexOf(h)]).filter(v=>v!=='');
+        return [...new Set(vals)].length===2;
+      });
+      const depCol = (parsed.variables[0] && resolveCol(parsed.variables[0])) || appData.headers.find(h=>getColValues(h).length>0);
+      if (!groupCol || !depCol) return `<div style="color:var(--red);">T-TEST: Could not find group/variable columns</div>`;
+
+      const gIdx = appData.headers.indexOf(groupCol);
+      const dIdx = appData.headers.indexOf(depCol);
+      const groups = [...new Set(appData.rows.map(r=>r[gIdx]).filter(v=>v!==''))].sort();
+      if (groups.length !== 2) return `<div style="color:var(--red);">T-TEST: Group column must have exactly 2 values</div>`;
+
+      const g1 = appData.rows.filter(r=>String(r[gIdx])===String(groups[0])).map(r=>Number(r[dIdx])).filter(v=>!isNaN(v));
+      const g2 = appData.rows.filter(r=>String(r[gIdx])===String(groups[1])).map(r=>Number(r[dIdx])).filter(v=>!isNaN(v));
+      if (g1.length<2||g2.length<2) return `<div style="color:var(--red);">T-TEST: Not enough data</div>`;
+
+      const res = tTest(g1, g2);
+      const sig = res.p < 0.05;
+      return `<div style="font-weight:700;color:var(--amber);margin-bottom:12px;font-size:13px;">INDEPENDENT T-TEST</div>
+        <div style="background:var(--surface);border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px;">
+          <div style="padding:8px 12px;background:rgba(255,184,77,0.08);font-weight:600;font-size:12px;color:var(--amber);">${depCol} by ${groupCol}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);">
+            ${[['Group',`${groups[0]} / ${groups[1]}`],['N',`${res.na} / ${res.nb}`],['Mean',`${res.ma.toFixed(3)} / ${res.mb.toFixed(3)}`],
+               ['SD',`${res.sa.toFixed(3)} / ${res.sb.toFixed(3)}`],['t statistic',res.t.toFixed(4)],['df',res.df],
+               ['p-value',res.p.toFixed(4)],['Significance',sig?'p < 0.05 ✓':'p ≥ 0.05']
+            ].map(([l,v])=>`<div style="background:var(--surface2);padding:7px 10px;"><div style="font-size:10px;color:var(--text3);">${l}</div><div style="color:${l==='Significance'?(sig?'var(--green)':'var(--red)'):'var(--text)'};font-weight:500;font-size:11px;">${v}</div></div>`).join('')}
+          </div>
+        </div>
+        <div style="padding:10px 14px;border-radius:8px;background:${sig?'rgba(0,229,163,0.1)':'rgba(255,107,122,0.1)'};border:1px solid ${sig?'rgba(0,229,163,0.3)':'rgba(255,107,122,0.3)'};font-size:11px;color:${sig?'var(--green)':'var(--red)'};">
+          ${sig?'✓ Statistically significant difference between groups (p < 0.05)':'✗ No statistically significant difference between groups (p ≥ 0.05)'}
+        </div>`;
+    }
+
+    return `<div style="color:var(--text3);padding:8px 0;">Command executed: ${parsed.cmd}</div>`;
+  }
+
+  function runSyntaxCommand() {
+    const code = document.getElementById("syntaxCode").value.trim();
+    const feedbackDiv = document.getElementById("syntaxFeedback");
+    if (!code) { feedbackDiv.innerHTML = "No syntax entered."; return; }
+    if (!appData.rows.length) { feedbackDiv.innerHTML = "Load a dataset first (Excel/CSV)."; return; }
+
+    const lines = code.split('\n').filter(l => l.trim() && !l.trim().startsWith('*'));
+    const commands = lines.map(l => parseSPSSLine(l)).filter(Boolean);
+    
+    if (!commands.length) { feedbackDiv.innerHTML = "No valid commands found."; return; }
+
+    // Execute all commands and show in side panel
+    let allHTML = '';
+    let executed = 0;
+    commands.forEach(cmd => {
+      if (cmd.cmd === 'UNKNOWN') {
+        allHTML += `<div style="color:var(--amber);padding:8px 0;font-size:11px;">⚠ Unknown: ${cmd.raw}</div>`;
+        return;
+      }
+      allHTML += execCommand(cmd);
+      executed++;
+    });
+
+    // Show results panel
+    const panel = document.getElementById('syntaxResultPanel');
+    const content = document.getElementById('syntaxResultContent');
+    panel.style.width = '360px';
+    content.innerHTML = allHTML;
+    feedbackDiv.innerHTML = `✓ Executed ${executed} command(s) — results shown in panel →`;
+    feedbackDiv.style.color = 'var(--green)';
+    setTimeout(() => feedbackDiv.style.color = '', 2000);
+  }
+
+  function runSyntaxAndShowOutput() {
+    const code = document.getElementById("syntaxCode").value.trim();
+    if (!code) return;
+    if (!appData.rows.length) { document.getElementById("syntaxFeedback").innerHTML = "Load a dataset first."; return; }
+
+    const lines = code.split('\n').filter(l => l.trim() && !l.trim().startsWith('*'));
+    const commands = lines.map(l => parseSPSSLine(l)).filter(Boolean);
+    let allHTML = `<div style="padding:8px 0 16px;font-size:12px;color:var(--text3);font-family:var(--mono);">SPSS Syntax Output — ${new Date().toLocaleTimeString()}</div>`;
+    commands.forEach(cmd => { if (cmd.cmd !== 'UNKNOWN') allHTML += execCommand(cmd); });
+
+    switchView('output', document.querySelectorAll('.view-tab')[2]);
+    document.getElementById('outputContent').innerHTML = `<div class="output-section" style="padding:20px;">${allHTML}</div>`;
+    addActivity('analysis', `Syntax: executed ${commands.filter(c=>c.cmd!=='UNKNOWN').length} command(s)`);
+  }
+
+  function closeSyntaxResults() {
+    document.getElementById('syntaxResultPanel').style.width = '0';
+  }
+
+  function clearSyntax() {
+    document.getElementById("syntaxCode").value = "";
+    document.getElementById("syntaxFeedback").innerHTML = "Ready — type SPSS commands above";
+    closeSyntaxResults();
+    updateLineNums();
+  }
+
+  function insertDiabetesExample() {
+    document.getElementById("syntaxCode").value =
+`* Diabetes Dataset — Sample Analysis
+DESCRIPTIVES VARIABLES=Glucose,BMI,Age,Insulin /STATISTICS=MEAN STDDEV MIN MAX.
+FREQUENCIES VARIABLES=Outcome /BARCHART.
+CORRELATIONS VARIABLES=Glucose,BMI,Age,Insulin,DiabetesPedigreeFunction.
+T-TEST GROUPS=Outcome(0 1) /VARIABLES=Glucose.`;
+    document.getElementById("syntaxFeedback").innerHTML = "Diabetes example loaded — press F5 or click Run";
+    updateLineNums();
+  }
+
+  function insertExample() { insertDiabetesExample(); }
+
+  // ── F5 shortcut ──
+  document.addEventListener('keydown', e => {
+    if (e.key === 'F5' && document.getElementById('syntaxView').classList.contains('active')) {
+      e.preventDefault();
+      runSyntaxCommand();
+    }
+  });
+
+  // ── AI Syntax Generator ──
+  async function askAISyntax() {
+    const input = document.getElementById('aiSyntaxInput');
+    const prompt = input.value.trim();
+    if (!prompt) return;
+    const feedback = document.getElementById('syntaxFeedback');
+    const btn = document.querySelector('#aiAssistBar button');
+    btn.disabled = true;
+    btn.textContent = '...';
+    feedback.innerHTML = '⏳ AI is generating syntax...';
+
+    const cols = appData.headers.length ? appData.headers.join(', ') : 'Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age, Outcome';
+    const rows = appData.rows.length || 768;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 400,
+          messages: [{
+            role: 'user',
+            content: `You are an SPSS syntax expert. Generate SPSS-style syntax for this request.
+
+Dataset columns: ${cols}
+Rows: ${rows}
+
+Supported commands: DESCRIPTIVES, FREQUENCIES, CORRELATIONS, T-TEST
+For T-TEST format: T-TEST GROUPS=groupcol(val1 val2) /VARIABLES=numcol.
+For DESCRIPTIVES: DESCRIPTIVES VARIABLES=col1,col2 /STATISTICS=MEAN STDDEV MIN MAX.
+
+User request: "${prompt}"
+
+Respond with ONLY the SPSS syntax commands (no explanation, no markdown, just the commands). Use actual column names from the dataset. Start lines with * for comments.`
+          }]
+        })
+      });
+      const data = await res.json();
+      const syntax = data.content?.[0]?.text?.trim() || '';
+      if (syntax) {
+        const ta = document.getElementById('syntaxCode');
+        ta.value = (ta.value ? ta.value + '\n\n' : '') + syntax;
+        updateLineNums();
+        feedback.innerHTML = '✓ AI syntax generated — review and click Run';
+        feedback.style.color = 'var(--green)';
+        setTimeout(() => { feedback.style.color = ''; }, 2000);
+      }
+    } catch(err) {
+      feedback.innerHTML = '⚠ AI generation failed — try running commands manually';
+    }
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Generate';
+    input.value = '';
+  }
+
+  document.getElementById('aiSyntaxInput')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') askAISyntax();
+  });
+// ======================= Z-TEST FUNCTIONS =======================
+
+function openZTestModal() {
+  if (!appData.rows.length) {
+    setStatus("Load a file first", "ready");
+    return;
+  }
+  
+  // Fill dropdowns with column names
+  const colSelect = document.getElementById("ztestColumn");
+  const groupSelect = document.getElementById("ztestGroupCol");
+  const successSelect = document.getElementById("ztestSuccessCol");
+  
+  const options = appData.headers.map(h => `<option value="${h}">${h}</option>`).join('');
+  colSelect.innerHTML = options;
+  groupSelect.innerHTML = options;
+  successSelect.innerHTML = options;
+  
+  document.getElementById("ztestPanel").classList.add("open");
+}
+
+function closeZTestModal() {
+  document.getElementById("ztestPanel").classList.remove("open");
+}
+
+// Switch between one-sample and two-sample fields
+document.addEventListener("change", function(e) {
+  if (e.target.id === "ztestType") {
+    const isOneSample = e.target.value === "one_sample";
+    document.getElementById("ztestOneSampleFields").style.display = isOneSample ? "block" : "none";
+    document.getElementById("ztestTwoSampleFields").style.display = isOneSample ? "none" : "block";
+  }
+});
+
+async function runZTest() {
+  closeZTestModal();
+
+  const testType    = document.getElementById("ztestType").value;
+  const alternative = document.getElementById("ztestAlternative").value;
+
+  let payload = {
+    test_type:   testType,
+    alternative: alternative,
+    dataset: {
+      headers: appData.headers,
+      rows:    appData.rows
+    }
+  };
+
+  if (testType === "one_sample") {
+    payload.column = document.getElementById("ztestColumn").value;
+    payload.p0     = parseFloat(document.getElementById("ztestP0").value);
+  } else {
+    payload.group_column   = document.getElementById("ztestGroupCol").value;
+    payload.success_column = document.getElementById("ztestSuccessCol").value;
+  }
+
+  switchView('output', document.querySelectorAll('.view-tab')[2]);
+  setStatus('Running Z-Test via Python...', 'loading');
+
+  document.getElementById('outputContent').innerHTML = `
+    <div class="no-data" style="padding:60px;">
+      <div style="margin-bottom:12px;opacity:0.5;color:var(--blue);"><svg class="spinner" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>
+      <p>Sending data to Python analysis engine...</p>
+    </div>`;
+
+  try {
+    const res = await fetch(API + '/analyze/ztest', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error(`Server error: ${res.status}`);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'Z-Test failed');
+
+    const z = json.data.ztest;
+    renderZTestResult(z, testType);
+    addActivity('analysis', `Z-Test (${testType}, ${alternative}) — p=${z.p_value}`);
+    setStatus('Z-Test complete', 'ready');
+
+  } catch (err) {
+    const isOffline = err.message.includes('fetch') || err.message.includes('Failed');
+    document.getElementById('outputContent').innerHTML = `
+      <div class="output-section">
+        <div class="output-header">
+          <span style="color:var(--red);">⚠ ${isOffline ? 'Flask server not running' : 'Z-Test error'}</span>
+        </div>
+        <div style="padding:24px;font-size:13px;color:var(--text2);line-height:1.8;">
+          ${isOffline
+            ? `<strong style="color:var(--text);">To start the server:</strong><br>
+               Open terminal and run:<br>
+               <code style="background:var(--surface2);padding:8px 14px;border-radius:6px;display:inline-block;margin-top:8px;color:var(--green);">python analysis.py</code>`
+            : `Error: ${err.message}`}
+        </div>
+      </div>`;
+    setStatus('Error — is Flask running?', 'ready');
+  }
+}
+
+function renderZTestResult(z, testType) {
+  const sig = z.significant;
+  const sigColor  = sig ? 'var(--green)' : 'var(--red)';
+  const sigBg     = sig ? 'rgba(0,229,163,0.1)' : 'rgba(255,107,122,0.1)';
+  const sigBorder = sig ? 'rgba(0,229,163,0.3)' : 'rgba(255,107,122,0.3)';
+
+  let statsRows = '';
+
+  if (testType === 'one_sample') {
+    // ── One-sample layout ──
+    const ci = z.confidence_interval_95 || {};
+    statsRows = [
+      ['Column',        z.column],
+      ['N',             z.n],
+      ['Sample proportion (p̂)', z.p_hat],
+      ['Hypothesized p₀',       z.p0],
+      ['Z statistic',   z.z_statistic],
+      ['p-value',       z.p_value],
+      ['Alternative',   z.alternative],
+      ['95% CI lower',  ci.lower ?? '—'],
+      ['95% CI upper',  ci.upper ?? '—'],
+    ].map(([l, v]) => `
+      <div style="background:var(--surface2);padding:8px 12px;">
+        <div style="font-size:10px;color:var(--text3);">${l}</div>
+        <div style="color:var(--text);font-weight:500;">${v}</div>
+      </div>`).join('');
+
+  } else {
+    // ── Two-sample layout ──
+    statsRows = [
+      ['Group 1',               z.group1?.name],
+      ['N₁',                    z.group1?.N],
+      ['p̂₁',                    z.group1?.proportion],
+      ['Group 2',               z.group2?.name],
+      ['N₂',                    z.group2?.N],
+      ['p̂₂',                    z.group2?.proportion],
+      ['Pooled proportion',     z.pooled_proportion],
+      ['Z statistic',           z.z_statistic],
+      ['p-value',               z.p_value],
+      ['Alternative',           z.alternative],
+    ].map(([l, v]) => `
+      <div style="background:var(--surface2);padding:8px 12px;">
+        <div style="font-size:10px;color:var(--text3);">${l}</div>
+        <div style="color:var(--text);font-weight:500;">${v ?? '—'}</div>
+      </div>`).join('');
+  }
+
+  document.getElementById('outputContent').innerHTML = `
+    <div class="output-section">
+      <div class="output-header">
+        <span style="display:flex;align-items:center;gap:6px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Z-Test for Proportions — ${testType === 'one_sample' ? 'One Sample' : 'Two Sample'}
+        </span>
+        <span class="output-sub">${z.alternative}</span>
+      </div>
+      <div style="padding:20px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;">
+          ${statsRows}
+        </div>
+        <div style="padding:12px 16px;border-radius:8px;background:${sigBg};border:1px solid ${sigBorder};font-size:13px;color:${sigColor};font-weight:500;">
+          ${sig
+            ? '✓ Statistically significant (p &lt; 0.05)'
+            : '✗ Not statistically significant (p ≥ 0.05)'}
+        </div>
+        <p style="font-size:12px;color:var(--text3);margin-top:12px;">${z.interpretation || ''}</p>
+      </div>
+    </div>`;
+}
+
+  window.addEventListener("DOMContentLoaded", () => { checkAuth(); loadSavedData(); });
+</script>
+</body>
+</html>

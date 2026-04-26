@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StatLab — Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body { overflow-x: hidden; }
+  </style>
+</head>
+<body class="profile-page">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">
+      <div class="logo-icon">SL</div>
+      StatLab
+    </div>
+
+    <!-- Mobile menu toggle -->
+    <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="nav-menu">
+      <a href="index.html" class="nav-link" onclick="toggleSidebar()">Home</a>
+      <a href="index.html#features" class="nav-link" onclick="toggleSidebar()">Features</a>
+      <a href="index.html#about" class="nav-link" onclick="toggleSidebar()">About</a>
+      <a href="index.html#how-it-works" class="nav-link" onclick="toggleSidebar()">How It Works</a>
+    </nav>
+
+    <div class="header-right">
+      <button class="toolbar-btn primary" onclick="location.href='workspace.html'">Start Analysis Now</button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <main class="profile-grid">
+    <!-- Sidebar -->
+    <aside class="profile-sidebar">
+      <div class="profile-card">
+        <div class="profile-avatar" id="profileAvatar">?</div>
+        <h2 class="profile-name" id="displayUserName">Ahmed Mohamed</h2>
+        <p class="profile-email" id="displayUserEmail">ahmed@example.com</p>
+        <div class="profile-stats">
+          <div class="profile-stat-item">
+            <div class="profile-stat-val" id="statAnalysis">0</div>
+            <div class="profile-stat-label">Analyses</div>
+          </div>
+          <div class="profile-stat-item">
+            <div class="profile-stat-val" id="statReports">0</div>
+            <div class="profile-stat-label">Reports</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Joined On</label>
+            <div style="color:var(--text2);font-family:var(--mono);font-size:13px;margin-top:4px;" id="displayJoinDate">—</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <button class="toolbar-btn primary" style="width:100%;justify-content:center;background:linear-gradient(135deg,var(--red) 0%,#d32f2f 100%)" onclick="logout()">
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </aside>
+
+
+    <!-- Main Content -->
+    <div class="profile-main">
+      <div class="profile-section">
+        <div class="section-header">
+          <h3 class="section-title">Recent Activity</h3>
+          <span class="output-sub" id="activityCount">Last 0 operations</span>
+        </div>
+        <div class="activity-scroll-container" id="activityList">
+          <div style="text-align:center;padding:60px 20px;color:var(--text3)">
+            <div style="font-size:48px;margin-bottom:16px;opacity:0.2">📜</div>
+            <p style="font-size:14px">No activity recorded yet</p>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Bottom spacing for status bar -->
+      <div style="height:60px"></div>
+    </div>
+  </main>
+
+  <!-- Status Bar -->
+  <div class="statusbar">
+    <div class="status-item">
+      <span class="status-dot ready"></span>
+      <span>Connected</span>
+    </div>
+    <div class="status-item">Version: <span>v1.2.0</span></div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      if (window.innerWidth > 768) return;
+      document.querySelector('.nav-menu').classList.toggle('open');
+      document.querySelector('.sidebar-overlay').classList.toggle('open');
+      document.querySelector('.mobile-toggle').classList.toggle('open');
+    }
+
+    function checkAuth() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      if (!isLoggedIn) {
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      const userName  = localStorage.getItem('userName');
+      const userEmail = localStorage.getItem('userEmail');
+      const joinDate  = localStorage.getItem('joinDate');
+
+      if (userName) {
+        document.getElementById('displayUserName').textContent = userName;
+        const initials = userName.trim().split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+        const av = document.getElementById('profileAvatar');
+        if (av) av.textContent = initials || 'U';
+      }
+      if (userEmail) document.getElementById('displayUserEmail').textContent = userEmail;
+      if (joinDate)  document.getElementById('displayJoinDate').textContent  = joinDate;
+
+      renderActivity();
+    }
+
+    function renderActivity() {
+      const activities = JSON.parse(localStorage.getItem('userActivity') || '[]');
+      const list = document.getElementById('activityList');
+      const count = document.getElementById('activityCount');
+
+      const analysisCount = activities.filter(a => a.type === 'analysis').length;
+      const reportCount = activities.filter(a => a.type === 'export').length;
+
+      document.getElementById('statAnalysis').textContent = analysisCount;
+      document.getElementById('statReports').textContent = reportCount;
+      count.textContent = `Last ${activities.length} operations`;
+
+      if (activities.length === 0) {
+        list.innerHTML = `
+          <div style="text-align:center;padding:60px 20px;color:var(--text3)">
+            <div style="font-size:48px;margin-bottom:16px;opacity:0.2">📜</div>
+            <p style="font-size:14px">No activity recorded yet</p>
+          </div>`;
+        return;
+      }
+
+      const icons = {
+        upload: {
+          svg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>`,
+          color: 'var(--amber)',
+          bg: 'rgba(255,184,77,0.1)'
+        },
+        analysis: {
+          svg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 12v-2a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5v2"/>
+                  <line x1="12" y1="2" x2="12" y2="22"/>
+                  <path d="M3 12h18"/>
+                  <rect x="5" y="14" width="4" height="6"/>
+                  <rect x="15" y="14" width="4" height="6"/>
+                </svg>`,
+          color: 'var(--blue)',
+          bg: 'rgba(79,163,255,0.1)'
+        },
+        export: {
+          svg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>`,
+          color: 'var(--green)',
+          bg: 'rgba(0,229,163,0.1)'
+        }
+      };
+
+      list.innerHTML = activities.map(act => {
+        const icon = icons[act.type] || icons.analysis;
+        const date = new Date(act.time);
+        const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = date.toLocaleDateString('en-US');
+        return `
+          <div class="activity-item">
+            <div class="activity-icon" style="background:${icon.bg};color:${icon.color}">${icon.svg}</div>
+            <div class="activity-info">
+              <div class="activity-text">${act.text}</div>
+              <div class="activity-time">${dateStr} · ${timeStr}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+    
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userName');
+      window.location.href = 'index.html';
+    }
+
+    window.onload = checkAuth;
+  </script>
+</body>
+</html>
