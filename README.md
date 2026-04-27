@@ -1,5 +1,7 @@
 # StatLab — دليل التشغيل
 
+Contribution by Sara Fathy
+
 ## المتطلبات
 - Python 3.8 أو أحدث → https://www.python.org/downloads/
 
