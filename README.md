@@ -18,7 +18,7 @@ chmod +x start.sh
 ./start.sh
 ```
 
-### يدوياً (أي نظام)
+### يدويا (أي نظام)
 ```bash
 pip install -r requirements.txt
 python analysis.py
